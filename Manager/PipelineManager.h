@@ -8,6 +8,23 @@
 #include "../object/Sprite.h"
 #include "../object/Sphere.h"
 
+enum class BlendMode {
+	// ブレンドなし
+	kBlendModeNone,
+	// 通常αブレンド
+	kBlendModeNormal,
+	// 加算
+	kBlendModeAdd,
+	// 減算
+	kBlendModeSubtract,
+	// 乗算
+	kBlendModeMultiply,
+	// スクリーン
+	kBlendModeScreen,
+	// 利用してはいけない
+	kCountOfBlendMode,
+};
+
 class PipelineManager {
 public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap_.Get(); }
