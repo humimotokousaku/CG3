@@ -1,7 +1,7 @@
 #include "Model.h"
-#include "components/camera/Camera.h"
-#include "Manager/ImGuiManager.h"
-#include "utility/GlobalVariables.h"
+#include "../components/camera/Camera.h"
+#include "../Manager/ImGuiManager.h"
+#include "../utility/GlobalVariables.h"
 #include <cassert>
 #define _USE_MATH_DEFINES
 #include <math.h>

@@ -12,7 +12,7 @@
 #include "../components/light/DirectionalLight.h"
 #include "../components/light/Light.h"
 #include "../ModelData.h"
-#include "../MaterialData.h"
+#include "../base/MaterialData.h"
 #include <wrl.h>
 #include "../base/DirectXCommon.h"
 

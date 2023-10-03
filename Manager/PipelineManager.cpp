@@ -3,7 +3,7 @@
 #include <format>
 #include <cassert>
 
-void MyEngine::DXCInitialize() {
+void PipelineManager::DXCInitialize() {
 	HRESULT hr;
 	// dxCompilerの初期化
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
@@ -16,7 +16,7 @@ void MyEngine::DXCInitialize() {
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* MyEngine::CompileShader(
+IDxcBlob* PipelineManager::CompileShader(
 	// CompilerするShaderファイルへのパス
 	const std::wstring& filePath,
 	// Compilerに使用するProfile
@@ -97,21 +97,21 @@ IDxcBlob* MyEngine::CompileShader(
 
 }
 
-void MyEngine::CreateDescriptorRange() {
+void PipelineManager::CreateDescriptorRange() {
 	descriptorRange_[0].BaseShaderRegister = 0;
 	descriptorRange_[0].NumDescriptors = 1;
 	descriptorRange_[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange_[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 }
 
-void MyEngine::CraeteDescriptorTable() {
+void PipelineManager::CraeteDescriptorTable() {
 	rootParameters_[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters_[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters_[2].DescriptorTable.pDescriptorRanges = descriptorRange_;
 	rootParameters_[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_);
 }
 
-void MyEngine::SettingSampler() {
+void PipelineManager::SettingSampler() {
 	staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -124,7 +124,7 @@ void MyEngine::SettingSampler() {
 	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers_);
 }
 
-void MyEngine::CreateRootParameter() {
+void PipelineManager::CreateRootParameter() {
 	rootParameters_[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters_[0].Descriptor.ShaderRegister = 0;
@@ -148,7 +148,7 @@ void MyEngine::CreateRootParameter() {
 	rootParameters_[3].Descriptor.ShaderRegister = 1;
 }
 
-void MyEngine::CreateRootSignature() {
+void PipelineManager::CreateRootSignature() {
 	HRESULT hr;
 
 	descriptionRootSignature_.Flags =
@@ -172,7 +172,7 @@ void MyEngine::CreateRootSignature() {
 	assert(SUCCEEDED(hr));
 }
 
-void MyEngine::SettingInputLayout() {
+void PipelineManager::SettingInputLayout() {
 	inputElementDescs_[0].SemanticName = "POSITION";
 	inputElementDescs_[0].SemanticIndex = 0;
 	inputElementDescs_[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -192,7 +192,7 @@ void MyEngine::SettingInputLayout() {
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 }
 
-void MyEngine::SettingBlendState() {
+void PipelineManager::SettingBlendState() {
 	// すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask =
 		D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -205,27 +205,27 @@ void MyEngine::SettingBlendState() {
 	//blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 }
 
-void MyEngine::SettingRasterizerState() {
+void PipelineManager::SettingRasterizerState() {
 	// 裏面(時計回り)を表示しない
 	rasterizerDesc_.CullMode = D3D12_CULL_MODE_BACK;
 	// 三角形の中を塗りつぶす
 	rasterizerDesc_.FillMode = D3D12_FILL_MODE_SOLID;
 }
 
-void MyEngine::PixelSharder() {
-	pixelShaderBlob_ = CompileShader(L"Object3d.PS.hlsl",
+void PipelineManager::PixelSharder() {
+	pixelShaderBlob_ = CompileShader(L"./resources/sharder/Object3d.PS.hlsl",
 		L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-void MyEngine::VertexSharder() {
+void PipelineManager::VertexSharder() {
 	// Shaderをコンパイルする
-	vertexShaderBlob_ = CompileShader(L"Object3d.VS.hlsl",
+	vertexShaderBlob_ = CompileShader(L"./resources/sharder/Object3d.VS.hlsl",
 		L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
 	assert(vertexShaderBlob_ != nullptr);
 }
 
-void MyEngine::CreatePSO() {
+void PipelineManager::CreatePSO() {
 	HRESULT hr;
 
 	graphicsPipelineStateDescs_.pRootSignature = rootSignature_.Get(); // rootSignature
@@ -255,7 +255,7 @@ void MyEngine::CreatePSO() {
 	assert(SUCCEEDED(hr));
 }
 
-void MyEngine::PSO() {
+void PipelineManager::PSO() {
 
 	CreateRootSignature();
 
@@ -278,7 +278,7 @@ void MyEngine::PSO() {
 	CreatePSO();
 }
 
-void MyEngine::CreateViewport() {
+void PipelineManager::CreateViewport() {
 	// クライアント領域のサイズと一緒にして画面全体に表示
 	viewport_.Width = (float)WinApp::kClientWidth_;
 	viewport_.Height = (float)WinApp::kClientHeight_;
@@ -288,7 +288,7 @@ void MyEngine::CreateViewport() {
 	viewport_.MaxDepth = 1.0f;
 }
 
-void MyEngine::CreateScissor() {
+void PipelineManager::CreateScissor() {
 	// 基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect_.left = 0;
 	scissorRect_.right = WinApp::kClientWidth_;
@@ -296,7 +296,7 @@ void MyEngine::CreateScissor() {
 	scissorRect_.bottom = WinApp::kClientHeight_;
 }
 
-void MyEngine::Initialize() {
+void PipelineManager::Initialize() {
 
 	// DXCの初期化
 	DXCInitialize();
@@ -308,7 +308,7 @@ void MyEngine::Initialize() {
 	CreateScissor();
 }
 
-void MyEngine::BeginFrame() {
+void PipelineManager::BeginFrame() {
 	DirectXCommon::GetInstance()->PreDraw(GetDsvDescriptorHeap().Get());
 
 	DirectXCommon::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport_); // Viewportを設定
@@ -318,12 +318,12 @@ void MyEngine::BeginFrame() {
 	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get()); // PSOを設定
 }
 
-void MyEngine::EndFrame() {
+void PipelineManager::EndFrame() {
 	// DirectX
 	DirectXCommon::GetInstance()->PostDraw();
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> MyEngine::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
+Microsoft::WRL::ComPtr<ID3D12Resource> PipelineManager::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
 	// 生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;									  // Textureの幅
@@ -360,7 +360,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> MyEngine::CreateDepthStencilTextureResour
 	return resource;
 }
 
-Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> MyEngine::CreateDsvDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> PipelineManager::CreateDsvDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 	HRESULT hr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
@@ -374,7 +374,7 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> MyEngine::CreateDsvDescriptorHeap(D
 	return descriptorHeap;
 }
 
-void MyEngine::CreateDepthStencilView() {
+void PipelineManager::CreateDepthStencilView() {
 	depthStencilResource_ = CreateDepthStencilTextureResource(WinApp::kClientWidth_, WinApp::kClientHeight_).Get();
 
 	dsvDescriptorHeap_ = CreateDsvDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false).Get();
@@ -386,7 +386,7 @@ void MyEngine::CreateDepthStencilView() {
 	DirectXCommon::GetInstance()->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, TextureManager::GetInstance()->GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV, 0));
 }
 
-void MyEngine::SettingDepthStencilState() {
+void PipelineManager::SettingDepthStencilState() {
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
 	// 書き込みをします

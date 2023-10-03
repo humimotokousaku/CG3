@@ -1,6 +1,6 @@
 #include "Cube.h"
 #include <cassert>
-#include "Manager/ImGuiManager.h"
+#include "../Manager/ImGuiManager.h"
 
 Cube::Cube() {
 }

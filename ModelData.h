@@ -1,6 +1,6 @@
 #pragma once
-#include "VertexData.h"
-#include "MaterialData.h"
+#include "../VertexData.h"
+#include "./base/MaterialData.h"
 #include <vector>
 
 struct ModelData {

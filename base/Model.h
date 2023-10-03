@@ -2,14 +2,13 @@
 #include "../math/Matrix4x4.h"
 #include "../VertexData.h"
 #include "../Transform.h"
-#include "../TransformationMatrix.h"
+#include "../base/WorldTransform.h"
+#include "../base/ViewProjection.h"
 #include "../Material.h"
-#include "../MaterialData.h"
+#include "MaterialData.h"
 #include <d3d12.h>
-#include "../Manager/TextureManager.h"
-#include "../base/DirectXCommon.h"
 
-class Bunny
+class Model
 {
 public:
 	ModelData GetModelData() { return modelData_; }
@@ -22,21 +21,17 @@ public:
 
 	void CreateMaterialResource();
 
-	void CreateWvpResource();
+	//void CreateWvpResource();
+
+	static Model* CreateModelFromObj(const std::string& directoryPath, const std::string& filename);
 
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
-	void Initialize();
+	void Initialize(const std::string& directoryPath, const std::string& filename);
 
-	void Draw();
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
-	void Release();
-
-	void ApplyGlobalVariables();
-
-	void ImGuiAdjustParameter();
-
-public:
+private:
 	// Material
 	Material* materialData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
@@ -46,15 +41,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
-	// カメラ
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-	TransformationMatrix* transformationMatrixData_;
-	Transform transform_;
-	Matrix4x4 viewMatrix_;
-	Matrix4x4 projectionMatrix_;
-	Matrix4x4 worldViewProjectionMatrix_;
 
 	ModelData modelData_;
-
-	bool isAlive_ = true;
 };
+

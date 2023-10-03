@@ -7,9 +7,8 @@
 #include "../components/light/Light.h"
 #include "../object/Sprite.h"
 #include "../object/Sphere.h"
-#include "../object/Plane.h"
 
-class MyEngine {
+class PipelineManager {
 public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencilResource() { return depthStencilResource_.Get(); }
@@ -82,7 +81,7 @@ public:
 	// シザー矩形
 	void CreateScissor();
 
-	~MyEngine() = default;
+	~PipelineManager() = default;
 
 	// エンジンの初期化
 	void Initialize();

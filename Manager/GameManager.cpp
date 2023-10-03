@@ -46,8 +46,8 @@ void GameManager::Initialize() {
 	textureManager_->TextureManager::GetInstance()->Initialize();
 
 	// エンジンの初期化
-	myEngine_ = new MyEngine();
-	myEngine_->Initialize();
+	pipelineManager_ = new PipelineManager();
+	pipelineManager_->Initialize();
 
 	// ライトの設定
 	light_ = Light::GetInstance();
@@ -66,7 +66,7 @@ void GameManager::Initialize() {
 	imGuiManager_->Initialize(winApp_->GetHwnd());
 
 	// ブローバル変数の読み込み
-	GlobalVariables::GetInstance()->LoadFiles();
+	//GlobalVariables::GetInstance()->LoadFiles();
 
 	//初期シーンの設定
 	sceneNum_ = TITLE_SCENE;
@@ -121,6 +121,27 @@ void GameManager::Run() {
 	Finalize();
 }
 
+void GameManager::BeginFrame() {
+	input_->Update();
+	pipelineManager_->BeginFrame();
+	// デバッグカメラ
+	debugCamera_->Update();
+	// カメラの設定
+	camera_->SettingCamera();
+
+	// ImGui
+	imGuiManager_->PreDraw();
+	// グローバル変数の更新
+	//GlobalVariables::GetInstance()->Update();
+}
+
+void GameManager::EndFrame() {
+	// ImGui
+	imGuiManager_->PostDraw();
+
+	pipelineManager_->EndFrame();
+}
+
 void GameManager::Finalize() {
 	sceneArr_[sceneNum_]->Finalize();
 	for (int i = 0; i < 2; i++) {
@@ -129,7 +150,7 @@ void GameManager::Finalize() {
 	// ImGui
 	imGuiManager_->Release();
 	delete imGuiManager_;
-	delete myEngine_;
+	delete pipelineManager_;
 	textureManager_->Release();
 	directXCommon_->Release();
 	CloseWindow(winApp_->GetHwnd());
@@ -139,36 +160,12 @@ void GameManager::Finalize() {
 	textureManager_->ComUninit();
 }
 
-void GameManager::BeginFrame() {
-	input_->Update();
-	myEngine_->BeginFrame();
-	// デバッグカメラ
-	debugCamera_->Update();
-	// カメラの設定
-	camera_->SettingCamera();
 
-	// ImGui
-	imGuiManager_->PreDraw();
-	// グローバル変数の更新
-	GlobalVariables::GetInstance()->Update();
-}
-
-void GameManager::EndFrame() {
-	// ImGui
-	imGuiManager_->PostDraw();
-
-	myEngine_->EndFrame();
-}
 
 void GameManager::ImGuiAdjustParameter() {
 	ImGui::Begin("CommonSettings");
 	if (ImGui::BeginTabBar("CommonTabBar"))
 	{
-		// カメラのImGui
-		if (ImGui::BeginTabItem("Camera")) {
-			camera_->Camera::GetInstance()->DrawDebugParameter();
-			ImGui::EndTabItem();
-		}
 		// ライトのImGui
 		if (ImGui::BeginTabItem("Half Lambert")) {
 			light_->ImGuiAdjustParameter();
