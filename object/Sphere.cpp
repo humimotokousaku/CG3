@@ -1,5 +1,6 @@
 #include "Sphere.h"
 #include "../Manager/ImGuiManager.h"
+#include "../Manager/PipelineManager.h"
 #include <cassert>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -179,6 +180,10 @@ void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& vi
 	//transformationMatrixData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	//transformationMatrixData_->WVP = Multiply(transformationMatrixData_->World, *Camera::GetInstance()->GetTransformationMatrixData());
 	//transformationMatrixData_->World = MakeIdentity4x4();
+
+		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[0].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[0].Get()); // PSOを設定
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定

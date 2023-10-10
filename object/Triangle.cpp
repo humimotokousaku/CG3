@@ -4,6 +4,7 @@
 #include <format>
 #include <cassert>
 #include "../Manager/ImGuiManager.h"
+#include "../Manager/PipelineManager.h"
 #include "../utility/GlobalVariables.h"
 
 Triangle::Triangle(Vector4 left, Vector4 top, Vector4 right) {
@@ -82,6 +83,10 @@ void Triangle::Draw() {
 	wvpData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	wvpData_->World = Multiply(wvpData_->World, *Camera::GetInstance()->GetTransformationMatrixData());
 	wvpData_->WVP = wvpData_->World;
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[0].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[0].Get()); // PSOを設定
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定

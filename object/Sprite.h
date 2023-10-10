@@ -20,7 +20,7 @@ public:
 	/// </summary>
 	/// <param name="pos">座標を入力</param>
 	/// <param name="textureNum">textureManagerで登録したenum型の番号を入れる</param>
-	void Draw(Vector3 pos, int textureNum);
+	void Draw(Vector3 pos, int textureNum, int blendNum);
 
 	void Release();
 

@@ -46,7 +46,7 @@ void GameManager::Initialize() {
 	textureManager_->TextureManager::GetInstance()->Initialize();
 
 	// エンジンの初期化
-	pipelineManager_ = new PipelineManager();
+	pipelineManager_ = PipelineManager::GetInstance();
 	pipelineManager_->Initialize();
 
 	// ライトの設定
@@ -72,6 +72,8 @@ void GameManager::Initialize() {
 	sceneNum_ = TITLE_SCENE;
 	// シーンごとの初期化
 	sceneArr_[sceneNum_]->Initialize();
+
+
 }
 
 void GameManager::Run() {
@@ -150,7 +152,7 @@ void GameManager::Finalize() {
 	// ImGui
 	imGuiManager_->Release();
 	delete imGuiManager_;
-	delete pipelineManager_;
+	//delete pipelineManager_;
 	textureManager_->Release();
 	directXCommon_->Release();
 	CloseWindow(winApp_->GetHwnd());

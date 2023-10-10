@@ -2,25 +2,27 @@
 #include "../Manager/ImGuiManager.h"
 
 void TitleScene::Initialize() {
-	block_ = Model::CreateModelFromObj("resources", "block.obj");
-	axis_ = Model::CreateModelFromObj("resources", "axis.obj");
+	plane_ = Model::CreateModelFromObj("resources", "plane.obj");
 
-	textureNum_ = UVCHEKER;
 	input_ = Input::GetInstance();
 
-	for (int i = 0; i < kMaxCube; i++) {
-		cubeWorldTransform_[i].Initialize();
+	for (int i = 0; i < kMaxSprite; i++) {
+		spriteWorldTransform_[i].Initialize();
 	}
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
-	for (int i = 0; i < kMaxCube; i++) {
-		cubeWorldTransform_[i].translation_.x = (float)i;
+
+	for (int i = 0; i < kMaxSprite; i++) {
+		spriteWorldTransform_[i].translation_.z = (float)4;
 	}
+
+	// カメラの初期位置
+	viewProjection_.translation_.z = -1.0f;
 }
 
 void TitleScene::Update() {
-	for (int i = 0; i < kMaxCube; i++) {
-		cubeWorldTransform_[i].UpdateMatrix();
+	for (int i = 0; i < kMaxSprite; i++) {
+		spriteWorldTransform_[i].UpdateMatrix();
 	}
 	worldTransform_.UpdateMatrix();
 
@@ -108,20 +110,23 @@ void TitleScene::Update() {
 
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
+
+	plane_->ImGuiAdjustParameter();
+
+	ImGui::Begin("BlendMode");
+	ImGui::SliderInt("Mode",&blendMode_, 0, 5);
+	ImGui::End();
 }
 
 void TitleScene::Draw() {
-	block_->Draw(cubeWorldTransform_[3], viewProjection_);
-	axis_->Draw(worldTransform_, viewProjection_);
+	plane_->Draw(worldTransform_, viewProjection_, blendMode_);
 }
 
 void TitleScene::Finalize() {
-	delete block_;
-	for (int i = 0; i < kMaxCube; i++) {
-		//delete cube_[i];
-		cubeWorldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
+	for (int i = 0; i < kMaxSprite; i++) {
+		spriteWorldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
 	}
-	delete axis_;
+	delete plane_;
 
 	worldTransform_.constBuff_.ReleaseAndGetAddressOf();
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();

@@ -1,5 +1,6 @@
 #include "Sprite.h"
 #include "../Manager/ImGuiManager.h"
+#include "../Manager/PipelineManager.h"
 #include <cassert>
 
 Sprite::~Sprite() {
@@ -53,15 +54,15 @@ void Sprite::Initialize() {
 	indexData_[5] = 2;
 
 	materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
-
 	// Lightingするか
 	materialData_->enableLighting = false;
-
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
+
+
 }
 
-void Sprite::Draw(Vector3 pos,int textureNum) {
+void Sprite::Draw(Vector3 pos,int textureNum, int blendNum) {
 	transform_.translate = pos;
 	uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
 	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
@@ -73,6 +74,10 @@ void Sprite::Draw(Vector3 pos,int textureNum) {
 	projectionMatrix_ = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 100.0f);
 	worldViewProjectionMatrix_ = Multiply(transformationMatrixData_->World, Multiply(viewMatrix_, projectionMatrix_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix_;
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[blendNum].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[blendNum].Get()); // PSOを設定
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定

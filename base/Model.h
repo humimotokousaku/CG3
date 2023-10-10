@@ -11,6 +11,17 @@
 class Model
 {
 public:
+	// Default Method
+	void Initialize(const std::string& directoryPath, const std::string& filename);
+
+	//void Update();
+
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int blendNum);
+
+	static Model* CreateModelFromObj(const std::string& directoryPath, const std::string& filename);
+
+	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+
 	ModelData GetModelData() { return modelData_; }
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes);
@@ -21,15 +32,8 @@ public:
 
 	void CreateMaterialResource();
 
-	//void CreateWvpResource();
-
-	static Model* CreateModelFromObj(const std::string& directoryPath, const std::string& filename);
-
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
-
-	void Initialize(const std::string& directoryPath, const std::string& filename);
-
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
+	// User Method
+	void ImGuiAdjustParameter();
 
 private:
 	// Material

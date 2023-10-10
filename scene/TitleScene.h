@@ -1,10 +1,11 @@
 #pragma once
 #include "IScene.h"
 #include "../components/Input.h"
-#include "../object/Sphere.h"
+#include "../object/Sprite.h"
 #include "../base/WorldTransform.h"
 #include "../base/ViewProjection.h"
 #include "../base/Model.h"
+#include "../Manager/PipelineManager.h"
 
 class GameManager;
 
@@ -16,13 +17,12 @@ public:
 	void Draw() override;
 	void Finalize()override;
 private:
-	Model* block_;
-	Model* axis_;
-	const static int kMaxCube = 100;
-	int textureNum_;
+	Model* plane_;
+	const static int kMaxSprite = 1;
 	Input* input_;
-	Vector3 pos_;
-	WorldTransform cubeWorldTransform_[kMaxCube];
+	WorldTransform spriteWorldTransform_[kMaxSprite];
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
+
+	int blendMode_ = kBlendModeNone;
 };

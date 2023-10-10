@@ -8,7 +8,7 @@
 #include "../object/Sprite.h"
 #include "../object/Sphere.h"
 
-enum class BlendMode {
+enum BlendMode {
 	// ブレンドなし
 	kBlendModeNone,
 	// 通常αブレンド
@@ -30,6 +30,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencilResource() { return depthStencilResource_.Get(); }
 	D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc() { return depthStencilDesc_; }
+	Microsoft::WRL::ComPtr<ID3D12PipelineState>* GetGraphicsPipelineState() { return graphicsPipelineState_; }
+	Microsoft::WRL::ComPtr<ID3D12RootSignature>* GetRootSignature() { return rootSignature_; }
+
+	static PipelineManager* GetInstance();
+
 	// DXCの初期化
 	void DXCInitialize();
 
@@ -113,24 +118,30 @@ private:
 	IDxcUtils* dxcUtils_;
 	IDxcCompiler3* dxcCompiler_;
 	IDxcIncludeHandler* includeHandler_;
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_;
-	ID3DBlob* signatureBlob_;
+
 	ID3DBlob* errorBlob_;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3];
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_;
-	D3D12_BLEND_DESC blendDesc_;
-	D3D12_RASTERIZER_DESC rasterizerDesc_;
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescs_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
+	static const int kMaxPSO = 6;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_[kMaxPSO];
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[kMaxPSO][3];
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_[kMaxPSO];
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_[kMaxPSO];
+	ID3DBlob* signatureBlob_[kMaxPSO];
+
+	D3D12_RASTERIZER_DESC rasterizerDesc_[kMaxPSO];
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescs_[kMaxPSO];
+	D3D12_BLEND_DESC blendDesc_[kMaxPSO];
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[kMaxPSO];
+	D3D12_ROOT_PARAMETER rootParameters_[kMaxPSO][5];
+	D3D12_DESCRIPTOR_RANGE descriptorRange_[kMaxPSO][1];
+	D3D12_STATIC_SAMPLER_DESC staticSamplers_[kMaxPSO][1];
+
 	IDxcBlob* vertexShaderBlob_;
 	IDxcBlob* pixelShaderBlob_;
 
 	D3D12_VIEWPORT viewport_;
 	D3D12_RECT scissorRect_;
-	D3D12_ROOT_PARAMETER rootParameters_[5];
-	D3D12_DESCRIPTOR_RANGE descriptorRange_[1];
-	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1];
+
 	// Depth
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;

@@ -1,6 +1,7 @@
 #include "Cube.h"
 #include <cassert>
 #include "../Manager/ImGuiManager.h"
+#include "../Manager//PipelineManager.h"
 
 Cube::Cube() {
 }
@@ -188,6 +189,10 @@ void Cube::Draw(const WorldTransform& worldTransform, const ViewProjection& view
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
 	//materialData_->uvTransform = uvTransformMatrix_;
+
+		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[0].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[0].Get()); // PSOを設定
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
