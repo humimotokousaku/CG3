@@ -16,7 +16,7 @@ public:
 
 	//void Update();
 
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int blendNum);
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int textureHandle, int blendNum);
 
 	static Model* CreateModelFromObj(const std::string& directoryPath, const std::string& filename);
 

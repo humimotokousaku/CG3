@@ -2,29 +2,29 @@
 #include "../Manager/ImGuiManager.h"
 
 void TitleScene::Initialize() {
-	plane_ = Model::CreateModelFromObj("resources", "plane.obj");
+	fence_ = Model::CreateModelFromObj("resources", "plane.obj");
 
 	input_ = Input::GetInstance();
 
-	for (int i = 0; i < kMaxSprite; i++) {
-		spriteWorldTransform_[i].Initialize();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].Initialize();
 	}
-	worldTransform_.Initialize();
 	viewProjection_.Initialize();
 
-	for (int i = 0; i < kMaxSprite; i++) {
-		spriteWorldTransform_[i].translation_.z = (float)4;
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].translation_.z = (float)4;
 	}
+	worldTransform_[0].rotation_.y = 0.5f;
+	worldTransform_[1].rotation_.y = -0.5f;
 
 	// カメラの初期位置
-	viewProjection_.translation_.z = -1.0f;
+	viewProjection_.translation_.z = -5.0f;
 }
 
 void TitleScene::Update() {
-	for (int i = 0; i < kMaxSprite; i++) {
-		spriteWorldTransform_[i].UpdateMatrix();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].UpdateMatrix();
 	}
-	worldTransform_.UpdateMatrix();
 
 	//// 追従対象からカメラまでのオフセット
 	//Vector3 offset = { 0.0f, 4.0f, -10.0f };
@@ -111,23 +111,22 @@ void TitleScene::Update() {
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
 
-	plane_->ImGuiAdjustParameter();
-
 	ImGui::Begin("BlendMode");
-	ImGui::SliderInt("Mode",&blendMode_, 0, 5);
+	ImGui::SliderInt("Mode", &blendMode_, 0, 5);
 	ImGui::End();
 }
 
 void TitleScene::Draw() {
-	plane_->Draw(worldTransform_, viewProjection_, blendMode_);
+	for (int i = 0; i < kMaxObject; i++) {
+		fence_->Draw(worldTransform_[i], viewProjection_,FENCE, blendMode_);
+	}
 }
 
 void TitleScene::Finalize() {
-	for (int i = 0; i < kMaxSprite; i++) {
-		spriteWorldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
-	}
-	delete plane_;
 
-	worldTransform_.constBuff_.ReleaseAndGetAddressOf();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
+	}
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
+	delete fence_;
 }

@@ -34,7 +34,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 
-void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int blendNum) {
+void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int textureHandle, int blendNum) {
 	//uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
@@ -54,7 +54,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
 	// DescriptorTableの設定
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[0]);
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[textureHandle]);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 
 	// マテリアルCBufferの場所を設定

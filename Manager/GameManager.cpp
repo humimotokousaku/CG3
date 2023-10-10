@@ -162,8 +162,6 @@ void GameManager::Finalize() {
 	textureManager_->ComUninit();
 }
 
-
-
 void GameManager::ImGuiAdjustParameter() {
 	ImGui::Begin("CommonSettings");
 	if (ImGui::BeginTabBar("CommonTabBar"))

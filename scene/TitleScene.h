@@ -17,11 +17,10 @@ public:
 	void Draw() override;
 	void Finalize()override;
 private:
-	Model* plane_;
-	const static int kMaxSprite = 1;
+	const static int kMaxObject = 2;
+	Model* fence_;
 	Input* input_;
-	WorldTransform spriteWorldTransform_[kMaxSprite];
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[kMaxObject];
 	ViewProjection viewProjection_;
 
 	int blendMode_ = kBlendModeNone;
