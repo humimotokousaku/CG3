@@ -2,7 +2,6 @@
 #include "../Manager/ImGuiManager.h"
 
 void TitleScene::Initialize() {
-	fence_ = Model::CreateModelFromObj("resources", "plane.obj");
 
 	input_ = Input::GetInstance();
 
@@ -19,6 +18,10 @@ void TitleScene::Initialize() {
 
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
+
+	// パーティクルの生成
+	particles_ = new Particles();
+	particles_->Initialize();
 }
 
 void TitleScene::Update() {
@@ -114,12 +117,12 @@ void TitleScene::Update() {
 	ImGui::Begin("BlendMode");
 	ImGui::SliderInt("Mode", &blendMode_, 0, 5);
 	ImGui::End();
+
+	particles_->ImGuiAdjustParameter();
 }
 
 void TitleScene::Draw() {
-	for (int i = 0; i < kMaxObject; i++) {
-		fence_->Draw(worldTransform_[i], viewProjection_,FENCE, blendMode_);
-	}
+	particles_->Draw(viewProjection_, kBlendModeNone);
 }
 
 void TitleScene::Finalize() {
@@ -128,5 +131,5 @@ void TitleScene::Finalize() {
 		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
 	}
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
-	delete fence_;
+	delete particles_;
 }

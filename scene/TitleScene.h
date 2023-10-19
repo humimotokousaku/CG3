@@ -7,6 +7,8 @@
 #include "../base/Model.h"
 #include "../Manager/PipelineManager.h"
 
+#include "../Particles.h"
+
 class GameManager;
 
 class TitleScene : public IScene
@@ -18,10 +20,11 @@ public:
 	void Finalize()override;
 private:
 	const static int kMaxObject = 2;
-	Model* fence_;
 	Input* input_;
 	WorldTransform worldTransform_[kMaxObject];
 	ViewProjection viewProjection_;
+
+	Particles* particles_;
 
 	int blendMode_ = kBlendModeNone;
 };
