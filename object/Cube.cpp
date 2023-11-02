@@ -273,10 +273,10 @@ void Cube::CreateMaterialResource() {
 }
 
 void Cube::CreateWvpResource() {
-	// 1つ分のサイズを用意する
-	wvpResource_ = CreateBufferResource(sizeof(TransformationMatrix)).Get();
-	// 書き込むためのアドレスを取得
-	wvpResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	// 単位行列を書き込んでおく
-	wvpData_->WVP = MakeIdentity4x4();
+	//// 1つ分のサイズを用意する
+	//wvpResource_ = CreateBufferResource(sizeof(TransformationMatrix)).Get();
+	//// 書き込むためのアドレスを取得
+	//wvpResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
+	//// 単位行列を書き込んでおく
+	//wvpData_->WVP = MakeIdentity4x4();
 }

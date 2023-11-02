@@ -15,24 +15,39 @@ void Particles::Initialize() {
 	modelData_.vertices.push_back({ .position = {-1.0f,-1.0f,0.0f,1.0f}, .texcoord = {0.0f,1.0f},.normal = {0.0f,0.0f,1.0f} }); // 左下
 	modelData_.vertices.push_back({ .position = {1.0f,1.0f,0.0f,1.0f}, .texcoord = {1.0f,0.0f},.normal = {0.0f,0.0f,1.0f} }); // 右上
 	modelData_.vertices.push_back({ .position = {1.0f,-1.0f,0.0f,1.0f}, .texcoord = {1.0f,1.0f},.normal = {0.0f,0.0f,1.0f} }); // 右下
-	modelData_.material.textureFilePath = "./resources/uvChecker.png";
+	//modelData_.material.textureFilePath = "./resources/uvChecker.png";
 
+	// Resource作成
+	instancingResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix) * kNumInstance);
+	instancingData_ = nullptr;
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+
+	// SRVの作成
+	uint32_t descriptorSizeSRV = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	instancingSrvDesc.Buffer.FirstElement = 0;
+	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	instancingSrvDesc.Buffer.NumElements = kNumInstance;
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+	// SRVを作成するDescriptorHeapの場所を決める
+	instancingSrvHandleCPU_ = DirectXCommon::GetInstance()->GetCPUDescriptorHandle(DirectXCommon::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 3);
+	instancingSrvHandleGPU_ = DirectXCommon::GetInstance()->GetGPUDescriptorHandle(DirectXCommon::GetInstance()->GetSrvDescriptorHeap(), descriptorSizeSRV, 3);
+	// SRVの生成
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
+
+	// 頂点データのメモリ確保
 	CreateVertexResource();
 	CreateVertexBufferView();
+
+	// マテリアルのメモリ確保
 	CreateMaterialResource();
-
-	for (int i = 0; i < kMaxParticle; i++) {
-		worldTransform_[i].Initialize();
-	}
-
 
 	// 書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-
-	for (int i = 0; i < kMaxParticle; i++) {
-		worldTransform_[i].translation_ = { 0.0f,0.0f,0.0f };
-	}
 
 	uvTransform_ = {
 		{1.0f,1.0f,1.0f},
@@ -47,21 +62,36 @@ void Particles::Initialize() {
 
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
+
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		instancingData_[index].WVP = MakeIdentity4x4();
+		instancingData_[index].World = MakeIdentity4x4();
+		transform_[index].scale = { 1.0f,1.0f,1.0f };
+		transform_[index].rotate = { 0,0,0 };
+		transform_[index].translate = { index * 0.1f,index * 0.1f,index * 0.1f };
+		viewProjection_[index].Initialize();
+	}
 }
 
-void Particles::Draw(const ViewProjection& viewProjection, int blendNum) {
+void Particles::Draw(const ViewProjection& viewProjection) {
 	//uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
 	//materialData_->uvTransform = uvTransformMatrix_;
 
-	for (int i = 0; i < kMaxParticle; i++) {
-		worldTransform_[i].UpdateMatrix();
+	for (uint32_t i = 0; i < kNumInstance; i++) {
+		Matrix4x4 worldMatrix = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
+		viewProjection_[i].UpdateMatrix();
+		instancingData_[i].WVP = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
+		
+		//worldTransform_[i].UpdateMatrix();
+		//instancingData_[i].World = Multiply(worldMatrix,viewProjection.matProjection);
+		instancingData_[i].World = MakeIdentity4x4();
 	}
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[blendNum].Get());
-	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[blendNum].Get()); // PSOを設定
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[6].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[6].Get()); // PSOを設定
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	DirectXCommon::GetInstance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -69,19 +99,19 @@ void Particles::Draw(const ViewProjection& viewProjection, int blendNum) {
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 
-	for (int i = 0; i < kMaxParticle; i++) {
-		DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform_[i].constBuff_->GetGPUVirtualAddress());
-	}
+	//for (int i = 0; i < kNumInstance; i++) {
+		//DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection_[i].constBuff_->GetGPUVirtualAddress());
+	//}
 
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
 	// DescriptorTableの設定
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[UVCHEKER]);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+
 	// マテリアルCBufferの場所を設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	for (int i = 0; i < kMaxParticle; i++) {
-		DirectXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), kMaxParticle, 0, 0);
-	}
+
+	DirectXCommon::GetInstance()->GetCommandList()->DrawInstanced(6, kNumInstance, 0, 0);
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> Particles::CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes) {
@@ -134,10 +164,10 @@ void Particles::CreateMaterialResource() {
 
 void Particles::ImGuiAdjustParameter() {
 	ImGui::Begin("Particles");
-		ImGui::DragFloat3("translation", &worldTransform_[0].translation_.x);
-		ImGui::DragFloat3("rotation", &worldTransform_[0].rotation_.x);
+	ImGui::DragFloat3("translation", &transform_[0].translate.x);
+	ImGui::DragFloat3("rotation", &transform_[0].rotate.x);
 
-		ImGui::DragFloat3("translation1", &worldTransform_[1].translation_.x);
-		ImGui::DragFloat3("rotation1", &worldTransform_[1].rotation_.x);
+	ImGui::DragFloat3("translation1", &transform_[9].translate.x);
+	ImGui::DragFloat3("rotation1", &transform_[9].rotate.x);
 	ImGui::End();
 }

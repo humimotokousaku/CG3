@@ -121,7 +121,7 @@ private:
 
 	ID3DBlob* errorBlob_;
 
-	static const int kMaxPSO = 6;
+	static const int kMaxPSO = 7;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_[kMaxPSO];
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[kMaxPSO][3];
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_[kMaxPSO];
@@ -134,10 +134,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[kMaxPSO];
 	D3D12_ROOT_PARAMETER rootParameters_[kMaxPSO][5];
 	D3D12_DESCRIPTOR_RANGE descriptorRange_[kMaxPSO][1];
+	// particle
+	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing_[1];
 	D3D12_STATIC_SAMPLER_DESC staticSamplers_[kMaxPSO][1];
 
+	// 通常
 	IDxcBlob* vertexShaderBlob_;
 	IDxcBlob* pixelShaderBlob_;
+	// particle用
+	IDxcBlob* particleVertexShaderBlob_;
+	IDxcBlob* particlePixelShaderBlob_;
 
 	D3D12_VIEWPORT viewport_;
 	D3D12_RECT scissorRect_;

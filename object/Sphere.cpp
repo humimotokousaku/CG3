@@ -54,12 +54,12 @@ void Sphere::CreateMaterialResource() {
 }
 
 void Sphere::CreateWvpResource() {
-	// 1つ分のサイズを用意する
-	transformationMatrixResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix)).Get();
-	// 書き込むためのアドレスを取得
-	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-	// 単位行列を書き込んでおく
-	transformationMatrixData_->WVP = MakeIdentity4x4();
+	//// 1つ分のサイズを用意する
+	//transformationMatrixResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix)).Get();
+	//// 書き込むためのアドレスを取得
+	//transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	//// 単位行列を書き込んでおく
+	//transformationMatrixData_->WVP = MakeIdentity4x4();
 }
 
 Sphere::~Sphere() {

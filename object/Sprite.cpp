@@ -64,16 +64,16 @@ void Sprite::Initialize() {
 
 void Sprite::Draw(Vector3 pos,int textureNum, int blendNum) {
 	transform_.translate = pos;
-	uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
-	materialData_->uvTransform = uvTransformMatrix_;
+	//uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
+	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
+	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
+	//materialData_->uvTransform = uvTransformMatrix_;
 
-	transformationMatrixData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	viewMatrix_ = MakeIdentity4x4();
-	projectionMatrix_ = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 100.0f);
-	worldViewProjectionMatrix_ = Multiply(transformationMatrixData_->World, Multiply(viewMatrix_, projectionMatrix_));
-	transformationMatrixData_->WVP = worldViewProjectionMatrix_;
+	//transformationMatrixData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	//viewMatrix_ = MakeIdentity4x4();
+	//projectionMatrix_ = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 100.0f);
+	//worldViewProjectionMatrix_ = Multiply(transformationMatrixData_->World, Multiply(viewMatrix_, projectionMatrix_));
+	//transformationMatrixData_->WVP = worldViewProjectionMatrix_;
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[blendNum].Get());
@@ -162,10 +162,10 @@ void Sprite::CreateMaterialResource() {
 }
 
 void Sprite::CreateWvpResource() {
-	// 1つ分のサイズを用意する
-	transformationMatrixResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix)).Get();
-	// 書き込むためのアドレスを取得
-	transformationMatrixResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-	// 単位行列を書き込んでおく
-	transformationMatrixData_->WVP = MakeIdentity4x4();
+	//// 1つ分のサイズを用意する
+	//transformationMatrixResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix)).Get();
+	//// 書き込むためのアドレスを取得
+	//transformationMatrixResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	//// 単位行列を書き込んでおく
+	//transformationMatrixData_->WVP = MakeIdentity4x4();
 }

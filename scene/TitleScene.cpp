@@ -122,7 +122,7 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	particles_->Draw(viewProjection_, kBlendModeNone);
+	particles_->Draw(viewProjection_);
 }
 
 void TitleScene::Finalize() {

@@ -105,21 +105,33 @@ IDxcBlob* PipelineManager::CompileShader(
 }
 
 void PipelineManager::CreateDescriptorRange() {
-	for (int i = 0; i < kMaxPSO; i++) {
+	for (int i = 0; i < kMaxPSO - 1; i++) {
 		descriptorRange_[i][0].BaseShaderRegister = 0;
 		descriptorRange_[i][0].NumDescriptors = 1;
 		descriptorRange_[i][0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		descriptorRange_[i][0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	}
+
+	// particle用
+	descriptorRangeForInstancing_[0].BaseShaderRegister = 0;
+	descriptorRangeForInstancing_[0].NumDescriptors = 1;
+	descriptorRangeForInstancing_[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangeForInstancing_[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 }
 
 void PipelineManager::CraeteDescriptorTable() {
-	for (int i = 0; i < kMaxPSO; i++) {
-		rootParameters_[i][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters_[i][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		rootParameters_[i][2].DescriptorTable.pDescriptorRanges = descriptorRange_[i];
-		rootParameters_[i][2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_[i]);
-	}
+	//// PS
+	//for (int i = 0; i < kMaxPSO - 1; i++) {
+	//	rootParameters_[i][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//	rootParameters_[i][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//	rootParameters_[i][2].DescriptorTable.pDescriptorRanges = descriptorRange_[i];
+	//	rootParameters_[i][2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_[i]);
+	//}
+	//// particle用
+	//rootParameters_[6][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//rootParameters_[6][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//rootParameters_[6][2].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing_;
+	//rootParameters_[6][2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing_);
 }
 
 void PipelineManager::SettingSampler() {
@@ -142,25 +154,56 @@ void PipelineManager::CreateRootParameter() {
 		rootParameters_[i][0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters_[i][0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][0].Descriptor.ShaderRegister = 0;
-		rootParameters_[i][1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		rootParameters_[i][1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters_[i][1].Descriptor.ShaderRegister = 0;
 
-		rootParameters_[i][4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		rootParameters_[i][4].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters_[i][4].Descriptor.ShaderRegister = 1;
+		if (i != 6) {
+			// worldTransform
+			rootParameters_[i][1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+			rootParameters_[i][1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+			rootParameters_[i][1].Descriptor.ShaderRegister = 0;
 
-		descriptionRootSignature_[i].pParameters = rootParameters_[i];
-		descriptionRootSignature_[i].NumParameters = _countof(rootParameters_[i]);
+			rootParameters_[i][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+			rootParameters_[i][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+			rootParameters_[i][2].DescriptorTable.pDescriptorRanges = descriptorRange_[i];
+			rootParameters_[i][2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_[i]);
 
-		CreateDescriptorRange();
-
-		CraeteDescriptorTable();
+			// viewProjection
+			rootParameters_[i][4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+			rootParameters_[i][4].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+			rootParameters_[i][4].Descriptor.ShaderRegister = 1;
+		}
 
 		rootParameters_[i][3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters_[i][3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][3].Descriptor.ShaderRegister = 1;
+
 	}
+
+	CreateDescriptorRange();
+	// particle用
+
+	// VS(t0)
+	// worldTransform
+	rootParameters_[6][1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters_[6][1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters_[6][1].Descriptor.ShaderRegister = 0;
+	rootParameters_[6][1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing_;
+	rootParameters_[6][1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing_);
+	// PS()
+	rootParameters_[6][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters_[6][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters_[6][2].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing_;
+	rootParameters_[6][2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing_);
+	// viewProjection
+	rootParameters_[6][4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters_[6][4].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters_[6][4].Descriptor.ShaderRegister = 1;
+
+	for (int i = 0; i < kMaxPSO; i++) {
+		descriptionRootSignature_[i].pParameters = rootParameters_[i];
+		descriptionRootSignature_[i].NumParameters = _countof(rootParameters_[i]);
+	}
+
+	//CraeteDescriptorTable();
 }
 
 void PipelineManager::CreateRootSignature() {
@@ -168,12 +211,12 @@ void PipelineManager::CreateRootSignature() {
 	for (int i = 0; i < kMaxPSO; i++) {
 		descriptionRootSignature_[i].Flags =
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-		// rootParameter生成
-		CreateRootParameter();
-		// samplerの設定
-		SettingSampler();
-
+	}
+	// rootParameter生成
+	CreateRootParameter();
+	// samplerの設定
+	SettingSampler();
+	for (int i = 0; i < kMaxPSO; i++) {
 		// シリアライズしてバイナリにする
 		hr = D3D12SerializeRootSignature(&descriptionRootSignature_[i],
 			D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_[i], &errorBlob_);
@@ -189,7 +232,7 @@ void PipelineManager::CreateRootSignature() {
 }
 
 void PipelineManager::SettingInputLayout() {
-	for(int i = 0;i < kMaxPSO;i++){
+	for (int i = 0; i < kMaxPSO; i++) {
 		inputElementDescs_[i][0].SemanticName = "POSITION";
 		inputElementDescs_[i][0].SemanticIndex = 0;
 		inputElementDescs_[i][0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -249,6 +292,11 @@ void PipelineManager::SettingBlendState() {
 	blendDesc_[5].RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
 	blendDesc_[5].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	blendDesc_[5].RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+
+	// particle
+	blendDesc_[6].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc_[6].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc_[6].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 }
 
 void PipelineManager::SettingRasterizerState() {
@@ -261,9 +309,14 @@ void PipelineManager::SettingRasterizerState() {
 }
 
 void PipelineManager::PixelSharder() {
+	// 通常
 	pixelShaderBlob_ = CompileShader(L"./resources/sharder/Object3d.PS.hlsl",
 		L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
 	assert(pixelShaderBlob_ != nullptr);
+	// パーティクル
+	particlePixelShaderBlob_ = CompileShader(L"./resources/sharder/Particle.PS.hlsl",
+		L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+	assert(particlePixelShaderBlob_ != nullptr);
 }
 
 void PipelineManager::VertexSharder() {
@@ -271,6 +324,11 @@ void PipelineManager::VertexSharder() {
 	vertexShaderBlob_ = CompileShader(L"./resources/sharder/Object3d.VS.hlsl",
 		L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
 	assert(vertexShaderBlob_ != nullptr);
+
+	// particle
+	particleVertexShaderBlob_ = CompileShader(L"./resources/sharder/Particle.VS.hlsl",
+		L"vs_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
+	assert(particleVertexShaderBlob_ != nullptr);
 }
 
 void PipelineManager::CreatePSO() {
@@ -279,10 +337,20 @@ void PipelineManager::CreatePSO() {
 	for (int i = 0; i < kMaxPSO; i++) {
 		graphicsPipelineStateDescs_[i].pRootSignature = rootSignature_[i].Get(); // rootSignature
 		graphicsPipelineStateDescs_[i].InputLayout = inputLayoutDesc_[i]; // InputLayout
-		graphicsPipelineStateDescs_[i].VS = { vertexShaderBlob_->GetBufferPointer(),
-		vertexShaderBlob_->GetBufferSize() }; // vertexShader
-		graphicsPipelineStateDescs_[i].PS = { pixelShaderBlob_->GetBufferPointer(),
-		pixelShaderBlob_->GetBufferSize() }; // pixelShader
+		if (i != 6) {
+			graphicsPipelineStateDescs_[i].VS = { vertexShaderBlob_->GetBufferPointer(),
+			vertexShaderBlob_->GetBufferSize() }; // vertexShader
+			graphicsPipelineStateDescs_[i].PS = { pixelShaderBlob_->GetBufferPointer(),
+			pixelShaderBlob_->GetBufferSize() }; // pixelShader
+		}
+		// particleの時
+		else if (i == 6) {
+			graphicsPipelineStateDescs_[i].VS = { particleVertexShaderBlob_->GetBufferPointer(),
+			particleVertexShaderBlob_->GetBufferSize() }; // vertexShader
+			graphicsPipelineStateDescs_[i].PS = { particlePixelShaderBlob_->GetBufferPointer(),
+			particlePixelShaderBlob_->GetBufferSize() }; // pixelShader
+		}
+
 		// DepthStencilの設定
 		graphicsPipelineStateDescs_[i].DepthStencilState = GetDepthStencilDesc();
 		graphicsPipelineStateDescs_[i].DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;

@@ -68,21 +68,21 @@ void Triangle::Initialize() {
 }
 
 void Triangle::Draw() {
-	ApplyGlobalVariables();
-	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-	// ボタンを押したらsave
-	if (globalVariables->GetInstance()->GetIsSave()) {
-		globalVariables->SaveFile("Triangle");
-	}
+	//ApplyGlobalVariables();
+	//GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	//// ボタンを押したらsave
+	//if (globalVariables->GetInstance()->GetIsSave()) {
+	//	globalVariables->SaveFile("Triangle");
+	//}
 
-	uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
-	materialData_->uvTransform = uvTransformMatrix_;
+	//uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
+	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
+	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
+	//materialData_->uvTransform = uvTransformMatrix_;
 
-	wvpData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	wvpData_->World = Multiply(wvpData_->World, *Camera::GetInstance()->GetTransformationMatrixData());
-	wvpData_->WVP = wvpData_->World;
+	//wvpData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	//wvpData_->World = Multiply(wvpData_->World, *Camera::GetInstance()->GetTransformationMatrixData());
+	//wvpData_->WVP = wvpData_->World;
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[0].Get());
@@ -167,10 +167,10 @@ void Triangle::CreateMaterialResource() {
 }
 
 void Triangle::CreateWvpResource() {
-	// 1つ分のサイズを用意する
-	wvpResource_ = CreateBufferResource(sizeof(TransformationMatrix)).Get();
-	// 書き込むためのアドレスを取得
-	wvpResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	// 単位行列を書き込んでおく
-	wvpData_->WVP = MakeIdentity4x4();
+	//// 1つ分のサイズを用意する
+	//wvpResource_ = CreateBufferResource(sizeof(TransformationMatrix)).Get();
+	//// 書き込むためのアドレスを取得
+	//wvpResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
+	//// 単位行列を書き込んでおく
+	//wvpData_->WVP = MakeIdentity4x4();
 }
