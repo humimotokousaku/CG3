@@ -47,6 +47,8 @@ public:
 	// トリガー処理
 	bool GamePadTrigger(int GAMEPAD_NUM);
 
+	void GamePadVibration(int userIndex, WORD leftMotorSpeed, WORD rightMotorSpeed);
+
 private:
 	/// 
 	/// Keyboard

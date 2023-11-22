@@ -22,11 +22,29 @@ void TitleScene::Initialize() {
 	// パーティクルの生成
 	particles_ = new Particles();
 	particles_->Initialize();
+
+	isVibration_ = false;
 }
 
 void TitleScene::Update() {
+	particles_->Update(viewProjection_);
+
 	for (int i = 0; i < kMaxObject; i++) {
 		worldTransform_[i].UpdateMatrix();
+	}
+
+	if (input_->PressKey(DIK_SPACE)) {
+		isVibration_ = true;
+	}
+	else {
+		isVibration_ = false;
+	}
+
+	if (isVibration_) {
+		input_->GamePadVibration(0, 60000, 0000);
+	}
+	else {
+		input_->GamePadVibration(0, 0, 0);
 	}
 
 	//// 追従対象からカメラまでのオフセット
@@ -122,7 +140,7 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	particles_->Draw(viewProjection_);
+	particles_->Draw();
 }
 
 void TitleScene::Finalize() {

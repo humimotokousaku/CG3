@@ -232,7 +232,7 @@ void PipelineManager::CreateRootSignature() {
 }
 
 void PipelineManager::SettingInputLayout() {
-	for (int i = 0; i < kMaxPSO; i++) {
+	for (int i = 0; i < kMaxPSO-1; i++) {
 		inputElementDescs_[i][0].SemanticName = "POSITION";
 		inputElementDescs_[i][0].SemanticIndex = 0;
 		inputElementDescs_[i][0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -251,6 +251,23 @@ void PipelineManager::SettingInputLayout() {
 		inputLayoutDesc_[i].pInputElementDescs = inputElementDescs_[i];
 		inputLayoutDesc_[i].NumElements = _countof(inputElementDescs_[i]);
 	}
+	inputElementDescs_[6][0].SemanticName = "POSITION";
+	inputElementDescs_[6][0].SemanticIndex = 0;
+	inputElementDescs_[6][0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs_[6][0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs_[6][1].SemanticName = "TEXCOORD";
+	inputElementDescs_[6][1].SemanticIndex = 0;
+	inputElementDescs_[6][1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs_[6][1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs_[6][2].SemanticName = "COLOR";
+	inputElementDescs_[6][2].SemanticIndex = 0;
+	inputElementDescs_[6][2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs_[6][2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputLayoutDesc_[6].pInputElementDescs = inputElementDescs_[6];
+	inputLayoutDesc_[6].NumElements = _countof(inputElementDescs_[6]);
 }
 
 void PipelineManager::SettingBlendState() {
@@ -431,13 +448,6 @@ void PipelineManager::BeginFrame() {
 
 	DirectXCommon::GetInstance()->GetCommandList()->RSSetViewports(1, &viewport_); // Viewportを設定
 	DirectXCommon::GetInstance()->GetCommandList()->RSSetScissorRects(1, &scissorRect_); // Scirssorを設定
-
-
-	for (int i = 0; i < kMaxPSO; i++) {
-		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-		//DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
-		//DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState_[i].Get()); // PSOを設定
-	}
 }
 
 void PipelineManager::EndFrame() {

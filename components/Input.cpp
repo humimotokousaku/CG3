@@ -86,3 +86,13 @@ bool Input::GamePadTrigger(int GAMEPAD_NUM) {
 	XInputGetState(0, &controllerState);
 	return (controllerState.Gamepad.wButtons & GAMEPAD_NUM) == 0;
 }
+
+void Input::GamePadVibration(int userIndex, WORD leftMotorSpeed, WORD rightMotorSpeed) {
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+
+	vibration.wLeftMotorSpeed = leftMotorSpeed;   // 左モーターの速度 (0-65535)
+	vibration.wRightMotorSpeed = rightMotorSpeed; // 右モーターの速度 (0-65535)
+
+	XInputSetState(userIndex, &vibration); // 振動を設定
+}

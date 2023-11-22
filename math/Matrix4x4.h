@@ -56,6 +56,8 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 // スカラー倍
 Vector3 Multiply(const Vector3& v1, const Vector3& v2);
 
+Vector3 Multiply(const float& scalar, const Vector3& v);
+
 // 内積
 float Dot(const Vector3& v1, const Vector3& v2);
 

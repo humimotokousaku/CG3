@@ -7,7 +7,23 @@
 #include "Material.h"
 #include  "Transform.h"
 #include "base/MaterialData.h"
+#include <random>
 #include <d3d12.h>
+
+struct Particle {
+	Transform transform;
+	Vector3 vel;
+	Vector4 color;
+	float lifeTime;
+	float currentTime;
+};
+
+// GPUに送る
+struct ParticleForGPU {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
+};
 
 class Particles
 {
@@ -20,16 +36,21 @@ public:
 	void Initialize();
 
 	// 更新処理
-	//void Update();
+	void Update(const ViewProjection& viewProjection);
 
 	// 描画
-	void Draw(const ViewProjection& viewProjection);
+	void Draw();
 
 	ModelData GetModelData() { return modelData_; }
 	///
 	/// User Method
 	/// 
 	
+	// particleの座標と速度のランダム生成
+	Particle MakeNewParticle(std::mt19937& randomEngine);
+
+	Vector3 KelvinToRGB(int kelvin);
+
 	// ImGuiでパラメータをまとめたもの
 	void ImGuiAdjustParameter();
 private:
@@ -42,6 +63,9 @@ private:
 
 	void CreateMaterialResource();
 
+	// 線形補完
+	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+
 private:
 	// Material
 	Material* materialData_;
@@ -53,15 +77,20 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
 	// 複数描画のための変数
-	//const static int kMaxParticle = 10;
-	const static uint32_t kNumInstance = 10;
+	const static uint32_t kNumMaxInstance = 10;
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
-	TransformationMatrix* instancingData_;
+	ParticleForGPU* instancingData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
-	Transform transform_[kNumInstance];
-	ViewProjection viewProjection_[kNumInstance];
+	
+	Particle particles_[kNumMaxInstance];
+	const float kDeltaTime = 1.0f / 60.0f;
+	uint32_t numInstance = 0;
+	
+	ViewProjection viewProjection_[kNumMaxInstance];
 
 	ModelData modelData_;
+
+	Vector3 a = {0,0,0};
 };
 

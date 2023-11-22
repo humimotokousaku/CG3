@@ -418,6 +418,14 @@ Vector3 Multiply(const Vector3& v1, const Vector3& v2) {
 	return result;
 }
 
+Vector3 Multiply(const float& scalar, const Vector3& v) {
+	Vector3 result;
+	result.x = v.x * scalar;
+	result.y = v.y * scalar;
+	result.z = v.z * scalar;
+	return result;
+}
+
 // 内積
 float Dot(const Vector3& v1, const Vector3& v2) {
 	float result{};

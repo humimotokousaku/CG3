@@ -8,6 +8,8 @@
 #include "../Manager/PipelineManager.h"
 
 #include "../Particles.h"
+#include <iostream>
+#include <cmath>
 
 class GameManager;
 
@@ -27,4 +29,8 @@ private:
 	Particles* particles_;
 
 	int blendMode_ = kBlendModeNone;
+
+	bool isVibration_;
+
+
 };
