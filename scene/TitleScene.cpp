@@ -27,7 +27,7 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Update() {
-	particles_->Update(viewProjection_);
+	particles_->Update();
 
 	for (int i = 0; i < kMaxObject; i++) {
 		worldTransform_[i].UpdateMatrix();
@@ -140,7 +140,7 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-	particles_->Draw();
+	particles_->Draw(viewProjection_);
 }
 
 void TitleScene::Finalize() {

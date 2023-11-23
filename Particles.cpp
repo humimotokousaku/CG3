@@ -76,36 +76,35 @@ void Particles::Initialize() {
 	}
 }
 
-void Particles::Update(const ViewProjection& viewProjection) {
+void Particles::Update() {
 
-	Normalize(a);
+
+	ImGui::Begin(" ");
+	ImGui::Text("0:translation.x %f", particles_[0].transform.translate.x);
+	ImGui::End();
+}
+
+void Particles::Draw(const ViewProjection& viewProjection) {
+	uint32_t numInstance = 0;
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		if (particles_[index].lifeTime <= particles_[index].currentTime) {
 			continue;
 		}
 
-
-
-		particles_[index].transform.translate = Add(particles_[index].transform.translate, Lerp(Vector3(1, 0, 0),a, 0.2f));//Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));
-		//particles_[index].currentTime += kDeltaTime;
+		particles_[index].transform.translate = Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));//Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));
+		particles_[index].currentTime += kDeltaTime;
 		Matrix4x4 worldMatrix = MakeAffineMatrix(particles_[index].transform.scale, particles_[index].transform.rotate, particles_[index].transform.translate);
-		viewProjection_[index].UpdateMatrix();
-		instancingData_[index].WVP = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
+		instancingData_[index].World = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
+		instancingData_[index].WVP = instancingData_[index].World;
 
-		instancingData_[index].World = MakeIdentity4x4();
-
+		float alpha = 1.0f - (particles_[index].currentTime / particles_[index].lifeTime);
 		instancingData_[index].color = particles_[index].color;
+		instancingData_[index].color.w = alpha;
 
 		materialData_->color = instancingData_[index].color;
 		++numInstance;
 	}
-	ImGui::Begin(" ");
-	ImGui::Text("0:translation.x %f", particles_[0].transform.translate.x);
-	ImGui::DragFloat("translation.x", &a.x, 0.1f);
-	ImGui::End();
-}
 
-void Particles::Draw() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[6].Get());
 	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[6].Get()); // PSOを設定
@@ -118,7 +117,7 @@ void Particles::Draw() {
 
 	// DescriptorTableの設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[WHITE]);
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[PARTICLE]);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 
 	// マテリアルCBufferの場所を設定

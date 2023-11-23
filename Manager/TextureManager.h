@@ -22,6 +22,7 @@ enum TextureName {
 	TESTBLOCK,
 	FENCE,
 	WHITE,
+	PARTICLE,
 	NONE_TEXTURE
 };
 

@@ -36,10 +36,10 @@ public:
 	void Initialize();
 
 	// 更新処理
-	void Update(const ViewProjection& viewProjection);
+	void Update();
 
 	// 描画
-	void Draw();
+	void Draw(const ViewProjection& viewProjection);
 
 	ModelData GetModelData() { return modelData_; }
 	///
@@ -85,12 +85,9 @@ private:
 	
 	Particle particles_[kNumMaxInstance];
 	const float kDeltaTime = 1.0f / 60.0f;
-	uint32_t numInstance = 0;
 	
 	ViewProjection viewProjection_[kNumMaxInstance];
 
 	ModelData modelData_;
-
-	Vector3 a = {0,0,0};
 };
 
