@@ -52,15 +52,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
+
 	// 複数描画のための変数
-	//const static int kMaxParticle = 10;
 	const static uint32_t kNumInstance = 10;
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 	TransformationMatrix* instancingData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 	Transform transform_[kNumInstance];
-	ViewProjection viewProjection_[kNumInstance];
 
 	ModelData modelData_;
 };

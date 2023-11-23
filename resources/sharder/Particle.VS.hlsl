@@ -22,7 +22,7 @@ VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_Instan
     VertexShaderOutput output;
     //float32_t4x4 WorldViewProjectionMatrix = mul(gViewProjectionMatrix.view, gViewProjectionMatrix.projection);
 
-    output.position = mul(input.position, gTransformationMatrices[instanceId].matWorld);
+    output.position = mul(input.position, gTransformationMatrices[instanceId].WVP);
     output.texcoord = input.texcoord;
     output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrices[instanceId].matWorld));
     return output;

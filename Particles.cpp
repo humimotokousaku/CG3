@@ -69,24 +69,15 @@ void Particles::Initialize() {
 		transform_[index].scale = { 1.0f,1.0f,1.0f };
 		transform_[index].rotate = { 0,0,0 };
 		transform_[index].translate = { index * 0.1f,index * 0.1f,index * 0.1f };
-		viewProjection_[index].Initialize();
 	}
 }
 
 void Particles::Draw(const ViewProjection& viewProjection) {
-	//uvTransformMatrix_ = MakeScaleMatrix(uvTransform_.scale);
-	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
-	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
-	//materialData_->uvTransform = uvTransformMatrix_;
-
 	for (uint32_t i = 0; i < kNumInstance; i++) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
-		viewProjection_[i].UpdateMatrix();
-		instancingData_[i].WVP = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
-		
-		//worldTransform_[i].UpdateMatrix();
-		//instancingData_[i].World = Multiply(worldMatrix,viewProjection.matProjection);
-		instancingData_[i].World = MakeIdentity4x4();
+		Matrix4x4 worldMatrix;
+		worldMatrix = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
+		instancingData_[i].World = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
+		instancingData_[i].WVP = instancingData_[i].World;
 	}
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
@@ -98,10 +89,6 @@ void Particles::Draw(const ViewProjection& viewProjection) {
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
-
-	//for (int i = 0; i < kNumInstance; i++) {
-		//DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection_[i].constBuff_->GetGPUVirtualAddress());
-	//}
 
 	// DescriptorTableの設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
