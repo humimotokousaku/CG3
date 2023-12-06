@@ -66,6 +66,8 @@ private:
 	// 線形補完
 	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 
+	Matrix4x4 AffineMatrix(const Vector3& scale, const Matrix4x4& rotateMatrix, const Vector3& translate);
+
 private:
 	// Material
 	Material* materialData_;
@@ -76,6 +78,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
+
 	// 複数描画のための変数
 	const static uint32_t kNumMaxInstance = 10;
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
@@ -85,8 +88,6 @@ private:
 	
 	Particle particles_[kNumMaxInstance];
 	const float kDeltaTime = 1.0f / 60.0f;
-	
-	ViewProjection viewProjection_[kNumMaxInstance];
 
 	ModelData modelData_;
 };

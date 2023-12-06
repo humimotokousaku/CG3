@@ -6,6 +6,7 @@
 #include <cassert>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <numbers>
 
 void Particles::Initialize() {
 	// 頂点の座標
@@ -63,21 +64,37 @@ void Particles::Initialize() {
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
 
+	// ランダムシード
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
-
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		instancingData_[index].WVP = MakeIdentity4x4();
 		instancingData_[index].World = MakeIdentity4x4();
-		instancingData_[index].color = Vector4(1.0f,1.0f,1.0f,1.0f);
+		instancingData_[index].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		particles_[index].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		particles_[index] = MakeNewParticle(randomEngine);
-		viewProjection_[index].Initialize();
 	}
 }
 
 void Particles::Update() {
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+		// 生存時間が過ぎたら処理を行わない
+		if (particles_[index].lifeTime <= particles_[index].currentTime) {
+			continue;
+		}
+		// 移動処理
+		particles_[index].transform.translate = Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));//Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));
+	
+		// 指定した時間に透明になる
+		float alpha = 1.0f - (particles_[index].currentTime / particles_[index].lifeTime);
+		instancingData_[index].color = particles_[index].color;
+		instancingData_[index].color.w = alpha;
+		// マテリアルカラーが色を扱ってるので代入
+		materialData_->color = instancingData_[index].color;
 
+		// 時間を進める
+		particles_[index].currentTime += kDeltaTime;
+	}
 
 	ImGui::Begin(" ");
 	ImGui::Text("0:translation.x %f", particles_[0].transform.translate.x);
@@ -85,23 +102,26 @@ void Particles::Update() {
 }
 
 void Particles::Draw(const ViewProjection& viewProjection) {
+	// カメラ行列
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(Vector3{ 1,1,1 }, viewProjection.rotation_, viewProjection.translation_);
+	// 板ポリを正面に向ける
+	Matrix4x4 backToFrontMatrix = MakeIdentity4x4();
+	// billboardMatrixを作成
+	Matrix4x4 billboardMatrix = cameraMatrix;
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+
 	uint32_t numInstance = 0;
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		if (particles_[index].lifeTime <= particles_[index].currentTime) {
 			continue;
 		}
-
-		particles_[index].transform.translate = Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));//Add(particles_[index].transform.translate, Multiply(kDeltaTime, particles_[index].vel));
-		particles_[index].currentTime += kDeltaTime;
-		Matrix4x4 worldMatrix = MakeAffineMatrix(particles_[index].transform.scale, particles_[index].transform.rotate, particles_[index].transform.translate);
+		// WVPとworldMatrixの計算
+		Matrix4x4 worldMatrix = AffineMatrix(particles_[index].transform.scale, billboardMatrix, particles_[index].transform.translate);//MakeAffineMatrix(particles_[index].transform.scale, Vector3{ 1,1,1 }/*particles_[index].transform.rotate*/, particles_[index].transform.translate);
 		instancingData_[index].World = Multiply(worldMatrix, Multiply(viewProjection.matView, viewProjection.matProjection));
 		instancingData_[index].WVP = instancingData_[index].World;
 
-		float alpha = 1.0f - (particles_[index].currentTime / particles_[index].lifeTime);
-		instancingData_[index].color = particles_[index].color;
-		instancingData_[index].color.w = alpha;
-
-		materialData_->color = instancingData_[index].color;
 		++numInstance;
 	}
 
@@ -167,7 +187,7 @@ void Particles::CreateVertexBufferView() {
 }
 
 void Particles::CreateMaterialResource() {
-	materialResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(Material)*kNumMaxInstance).Get();
+	materialResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(Material) * kNumMaxInstance).Get();
 	// マテリアルにデータを書き込む
 	materialData_ = nullptr;
 	// 書き込むためのアドレスを取得
@@ -176,7 +196,7 @@ void Particles::CreateMaterialResource() {
 
 void Particles::ImGuiAdjustParameter() {
 	ImGui::Begin("Particles");
-	ImGui::DragFloat("translation.x", &particles_[0].transform.translate.x, 0.1f);
+	ImGui::DragFloat("translation.x", &particles_[0].transform.rotate.x, 0.1f);
 	ImGui::End();
 }
 
@@ -238,4 +258,32 @@ Particle Particles::MakeNewParticle(std::mt19937& randomEngine) {
 // 線形補完
 Vector3 Particles::Lerp(const Vector3& v1, const Vector3& v2, float t) {
 	return  Add(v1, Multiply(t, Subtract(v2, v1)));
+}
+
+Matrix4x4 Particles::AffineMatrix(const Vector3& scale, const Matrix4x4& rotateMatrix, const Vector3& translate) {
+	// 計算結果
+	Matrix4x4 result{};
+
+	// アフィン変換行列の計算
+	result.m[0][0] = scale.x * rotateMatrix.m[0][0];
+	result.m[0][1] = scale.x * rotateMatrix.m[0][1];
+	result.m[0][2] = scale.x * rotateMatrix.m[0][2];
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = scale.y * rotateMatrix.m[1][0];
+	result.m[1][1] = scale.y * rotateMatrix.m[1][1];
+	result.m[1][2] = scale.y * rotateMatrix.m[1][2];
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = scale.z * rotateMatrix.m[2][0];
+	result.m[2][1] = scale.z * rotateMatrix.m[2][1];
+	result.m[2][2] = scale.z * rotateMatrix.m[2][2];
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = translate.x;
+	result.m[3][1] = translate.y;
+	result.m[3][2] = translate.z;
+	result.m[3][3] = 1.0f;
+
+	return result;
 }

@@ -80,7 +80,7 @@ void TitleScene::Update() {
 		Vector3 move = { speed,0,0 };
 
 		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, viewProjection_.matView);
+	//	move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
@@ -90,7 +90,7 @@ void TitleScene::Update() {
 		Vector3 move = { speed,0,0 };
 
 		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, viewProjection_.matView);
+		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
@@ -100,7 +100,7 @@ void TitleScene::Update() {
 		Vector3 move = { 0,0, speed };
 
 		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, viewProjection_.matView);
+		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
@@ -110,7 +110,7 @@ void TitleScene::Update() {
 		Vector3 move = { 0,0, speed };
 
 		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, viewProjection_.matView);
+		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
