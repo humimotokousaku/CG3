@@ -5,23 +5,18 @@ void TitleScene::Initialize() {
 
 	input_ = Input::GetInstance();
 
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].Initialize();
-	}
-	viewProjection_.Initialize();
 
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].translation_.z = (float)4;
-	}
-	worldTransform_[0].rotation_.y = 0.5f;
-	worldTransform_[1].rotation_.y = -0.5f;
+	viewProjection_.Initialize();
+	worldTransform_.Initialize();
 
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
 
 	// パーティクルの生成
 	particles_ = new Particles();
-	particles_->Initialize();
+	particles_->Initialize(true,true);
+
+	//particles_->SetEmitterParent(&worldTransform_);
 
 	isVibration_ = false;
 }
@@ -29,9 +24,7 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 	particles_->Update();
 
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].UpdateMatrix();
-	}
+	worldTransform_.UpdateMatrix();
 
 	if (input_->PressKey(DIK_SPACE)) {
 		isVibration_ = true;
@@ -47,16 +40,6 @@ void TitleScene::Update() {
 		input_->GamePadVibration(0, 0, 0);
 	}
 
-	//// 追従対象からカメラまでのオフセット
-	//Vector3 offset = { 0.0f, 4.0f, -10.0f };
-	//// カメラの角度から回転行列を計算
-	//Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_.viewProjection_.rotation);
-
-	//// オフセットをカメラの回転に合わせて回転
-	//offset = TransformNormal(offset, rotateMatrix);
-
-	//// 座標をコピーしてオフセット分ずらす
-	//viewProjection_.translation_ = Add(worldTransform_.translation_, offset);
 	XINPUT_STATE joyState;
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		//// デッドゾーンの設定
@@ -76,41 +59,25 @@ void TitleScene::Update() {
 	// Keyboard
 	if (Input::GetInstance()->PressKey(DIK_LEFT)) {
 		const float speed = -0.1f;
-
 		Vector3 move = { speed,0,0 };
-
-		// 移動ベクトルをカメラの角度だけ回転
-	//	move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
 	if (Input::GetInstance()->PressKey(DIK_RIGHT)) {
 		const float speed = 0.1f;
-
 		Vector3 move = { speed,0,0 };
-
-		// 移動ベクトルをカメラの角度だけ回転
-		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
 	if (Input::GetInstance()->PressKey(DIK_UP)) {
 		const float speed = 0.1f;
-
 		Vector3 move = { 0,0, speed };
-
-		// 移動ベクトルをカメラの角度だけ回転
-		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
 	if (Input::GetInstance()->PressKey(DIK_DOWN)) {
 		const float speed = -0.1f;
-
 		Vector3 move = { 0,0, speed };
-
-		// 移動ベクトルをカメラの角度だけ回転
-		//move = TransformNormal(move, viewProjection_.matView);
 
 		viewProjection_.translation_ = Add(viewProjection_.translation_, move);
 	}
@@ -133,21 +100,19 @@ void TitleScene::Update() {
 	viewProjection_.TransferMatrix();
 
 	ImGui::Begin("BlendMode");
-	ImGui::SliderInt("Mode", &blendMode_, 0, 5);
+	ImGui::DragFloat3("worldTransform.translate", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
 	ImGui::End();
 
 	particles_->ImGuiAdjustParameter();
 }
 
 void TitleScene::Draw() {
-	particles_->Draw(viewProjection_);
+	particles_->Draw(viewProjection_, PARTICLE);
 }
 
 void TitleScene::Finalize() {
+	worldTransform_.constBuff_.ReleaseAndGetAddressOf();
 
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
-	}
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
 	delete particles_;
 }

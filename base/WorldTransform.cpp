@@ -32,5 +32,3 @@ void WorldTransform::UpdateMatrix() {
 
 	TransferMatrix();
 }
-
-//#endif // WORLD_TRANSFORM_H
