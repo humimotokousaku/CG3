@@ -69,3 +69,6 @@ Vector3 Normalize(const Vector3& v);
 
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+// 転置行列
+Matrix4x4 Transpose(const Matrix4x4& m);

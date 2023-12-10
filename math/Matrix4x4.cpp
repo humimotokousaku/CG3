@@ -460,3 +460,14 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 		v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] };
 	return result;
 }
+
+// 転置行列
+Matrix4x4 Transpose(const Matrix4x4& m) {
+	Matrix4x4 result{};
+	for (int row = 0; row < 4; ++row) {
+		for (int column = 0; column < 4; ++column) {
+			result.m[row][column] = m.m[column][row];
+		}
+	}
+	return result;
+}

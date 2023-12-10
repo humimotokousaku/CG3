@@ -10,6 +10,7 @@
 // 定数バッファ用データ構造体
 struct ConstBufferDataWorldTransform {
 	Matrix4x4 matWorld; // ローカル → ワールド変換行列
+	Matrix4x4 WorldInverseTranspose;  // ワールド行列を逆転置行列
 };
 
 /// <summary>
