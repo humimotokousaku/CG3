@@ -16,6 +16,9 @@ void TitleScene::Initialize() {
 	particles_ = new Particles();
 	particles_->Initialize(true,true);
 
+	sphere_ = new Sphere();
+	sphere_->Initialize();
+
 	//particles_->SetEmitterParent(&worldTransform_);
 
 	isVibration_ = false;
@@ -100,6 +103,7 @@ void TitleScene::Update() {
 	viewProjection_.TransferMatrix();
 
 	ImGui::Begin("BlendMode");
+	sphere_->ImGuiAdjustParameter();
 	ImGui::DragFloat3("worldTransform.translate", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
 	ImGui::End();
 
@@ -108,6 +112,7 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 	particles_->Draw(viewProjection_, PARTICLE);
+	sphere_->Draw(worldTransform_, viewProjection_);
 }
 
 void TitleScene::Finalize() {

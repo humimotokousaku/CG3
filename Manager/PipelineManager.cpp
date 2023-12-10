@@ -176,6 +176,9 @@ void PipelineManager::CreateRootParameter() {
 		rootParameters_[i][3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][3].Descriptor.ShaderRegister = 1;
 
+		rootParameters_[i][5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		rootParameters_[i][5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters_[i][5].Descriptor.ShaderRegister = 2;
 	}
 
 	CreateDescriptorRange();

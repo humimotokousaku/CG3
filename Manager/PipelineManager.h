@@ -132,7 +132,7 @@ private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescs_[kMaxPSO];
 	D3D12_BLEND_DESC blendDesc_[kMaxPSO];
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[kMaxPSO];
-	D3D12_ROOT_PARAMETER rootParameters_[kMaxPSO][5];
+	D3D12_ROOT_PARAMETER rootParameters_[kMaxPSO][6];
 	D3D12_DESCRIPTOR_RANGE descriptorRange_[kMaxPSO][1];
 	// particle
 	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing_[1];

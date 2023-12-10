@@ -1,5 +1,5 @@
 #pragma once
-#include "../VertexData.h"
+#include "VertexData.h"
 #include "./base/MaterialData.h"
 #include <vector>
 

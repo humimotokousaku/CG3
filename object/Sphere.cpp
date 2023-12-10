@@ -54,12 +54,10 @@ void Sphere::CreateMaterialResource() {
 }
 
 void Sphere::CreateWvpResource() {
-	//// 1つ分のサイズを用意する
-	//transformationMatrixResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(TransformationMatrix)).Get();
-	//// 書き込むためのアドレスを取得
-	//transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-	//// 単位行列を書き込んでおく
-	//transformationMatrixData_->WVP = MakeIdentity4x4();
+	// 1つ分のサイズを用意する
+	cameraPosResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(Vector3)).Get();
+	// 書き込むためのアドレスを取得
+	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
 }
 
 Sphere::~Sphere() {
@@ -71,14 +69,13 @@ void Sphere::Initialize() {
 
 	CreateMaterialResource();
 
-	//CreateWvpResource();
+	CreateWvpResource();
 
 	CreateVertexBufferView();
 
 	// 書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	uvTransform_ = {
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
@@ -162,12 +159,11 @@ void Sphere::Initialize() {
 	}
 
 	materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
-
 	// Lightingするか
 	materialData_->enableLighting = true;
-
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->shininess = 10;
 }
 
 void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
@@ -176,21 +172,18 @@ void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& vi
 	uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
 	materialData_->uvTransform = uvTransformMatrix_;
 
-	// カメラ
-	//transformationMatrixData_->World = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	//transformationMatrixData_->WVP = Multiply(transformationMatrixData_->World, *Camera::GetInstance()->GetTransformationMatrixData());
-	//transformationMatrixData_->World = MakeIdentity4x4();
+	cameraPosData_ = viewProjection.translation_;//viewProjection.constMap->cameraPos;
 
-		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[0].Get());
-	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[0].Get()); // PSOを設定
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[1].Get());
+	DirectXCommon::GetInstance()->GetCommandList()->SetPipelineState(PipelineManager::GetInstance()->GetGraphicsPipelineState()[1].Get()); // PSOを設定
 
 	// コマンドを積む
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.constBuff_->GetGPUVirtualAddress());
-
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraPosResource_.Get()->GetGPUVirtualAddress());
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	DirectXCommon::GetInstance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -211,11 +204,9 @@ void Sphere::Release() {
 void Sphere::ImGuiAdjustParameter() {
 	ImGui::CheckboxFlags("isLighting", &materialData_->enableLighting, 1);
 	ImGui::Checkbox("useMonsterBall", &useMonsterBall_);
-	ImGui::SliderFloat3("Translate", &transform_.translate.x, -5, 5);
-	ImGui::SliderFloat3("Scale", &transform_.scale.x, -5, 5);
-	ImGui::SliderFloat3("Rotate", &transform_.rotate.x, -6.28f, 6.28f);
 	ImGui::Text("UvTransform");
 	ImGui::SliderFloat2("UvTranslate", &uvTransform_.translate.x, -5, 5);
 	ImGui::SliderFloat2("UvScale", &uvTransform_.scale.x, -5, 5);
 	ImGui::SliderAngle("UvRotate.z", &uvTransform_.rotate.z);
+	ImGui::DragFloat("shininess", &materialData_->shininess, 0.01f, 0, 50);
 }

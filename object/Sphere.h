@@ -46,12 +46,9 @@ public:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
 	// カメラ
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-	TransformationMatrix* transformationMatrixData_;
-	Transform transform_;
-	Matrix4x4 viewMatrix_;
-	Matrix4x4 projectionMatrix_;
-	Matrix4x4 worldViewProjectionMatrix_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_;
+	Vector3 cameraPosData_;
+
 	 //分割数
 	const uint32_t kSubdivision = 16;
 	// 頂点数
