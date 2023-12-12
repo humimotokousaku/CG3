@@ -18,6 +18,8 @@
 
 // components
 #include "../components/light/Light.h"
+#include "../PointLight.h"
+#include "../SpotLight.h"
 #include "../components/camera/Camera.h"
 #include "../components/camera/DebugCamera.h"
 #include "../components/Input.h"
@@ -71,6 +73,9 @@ private:
 	Camera* camera_;
 	DebugCamera* debugCamera_;
 	Light* light_;
+	PointLight* pointLight_;
+	SpotLight* spotLight_;
+
 	TextureManager* textureManager_;
 	ImGuiManager* imGuiManager_;
 	Input* input_;

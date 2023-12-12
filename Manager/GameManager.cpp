@@ -52,6 +52,12 @@ void GameManager::Initialize() {
 	// ライトの設定
 	light_ = Light::GetInstance();
 	light_->Initialize(DirectXCommon::GetInstance()->GetDevice());
+	// 点光源
+	pointLight_ = PointLight::GetInstance();
+	pointLight_->Initialize();
+	// スポットライト
+	spotLight_ = SpotLight::GetInstance();
+	spotLight_->Initialize();
 
 	// デバッグカメラの初期化
 	debugCamera_ = DebugCamera::GetInstance();
@@ -72,8 +78,6 @@ void GameManager::Initialize() {
 	sceneNum_ = TITLE_SCENE;
 	// シーンごとの初期化
 	sceneArr_[sceneNum_]->Initialize();
-
-
 }
 
 void GameManager::Run() {
@@ -167,8 +171,19 @@ void GameManager::ImGuiAdjustParameter() {
 	if (ImGui::BeginTabBar("CommonTabBar"))
 	{
 		// ライトのImGui
-		if (ImGui::BeginTabItem("Half Lambert")) {
+		// 平行光源
+		if (ImGui::BeginTabItem("Directional Light")) {
 			light_->ImGuiAdjustParameter();
+			ImGui::EndTabItem();
+		}
+		// 点光源
+		if (ImGui::BeginTabItem("Point Light")) {
+			pointLight_->ImGuiAdjustParameter();
+			ImGui::EndTabItem();
+		}
+		// スポットライト
+		if (ImGui::BeginTabItem("Spot Light")) {
+			spotLight_->ImGuiAdjustParameter();
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();

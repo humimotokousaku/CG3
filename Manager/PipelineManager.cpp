@@ -151,6 +151,7 @@ void PipelineManager::SettingSampler() {
 
 void PipelineManager::CreateRootParameter() {
 	for (int i = 0; i < kMaxPSO; i++) {
+		// material
 		rootParameters_[i][0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters_[i][0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][0].Descriptor.ShaderRegister = 0;
@@ -160,7 +161,8 @@ void PipelineManager::CreateRootParameter() {
 			rootParameters_[i][1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 			rootParameters_[i][1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 			rootParameters_[i][1].Descriptor.ShaderRegister = 0;
-
+			
+			// texture
 			rootParameters_[i][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParameters_[i][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 			rootParameters_[i][2].DescriptorTable.pDescriptorRanges = descriptorRange_[i];
@@ -171,11 +173,20 @@ void PipelineManager::CreateRootParameter() {
 			rootParameters_[i][4].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 			rootParameters_[i][4].Descriptor.ShaderRegister = 1;
 		}
-
+		// 平行光源
 		rootParameters_[i][3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters_[i][3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][3].Descriptor.ShaderRegister = 1;
+		// 点光源
+		rootParameters_[i][6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		rootParameters_[i][6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters_[i][6].Descriptor.ShaderRegister = 3;
+		// 点光源
+		rootParameters_[i][7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		rootParameters_[i][7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters_[i][7].Descriptor.ShaderRegister = 4;
 
+		// カメラ位置
 		rootParameters_[i][5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		rootParameters_[i][5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters_[i][5].Descriptor.ShaderRegister = 2;

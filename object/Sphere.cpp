@@ -1,6 +1,8 @@
 #include "Sphere.h"
 #include "../Manager/ImGuiManager.h"
 #include "../Manager/PipelineManager.h"
+#include "../PointLight.h"
+#include "../SpotLight.h"
 #include <cassert>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -163,7 +165,7 @@ void Sphere::Initialize() {
 	materialData_->enableLighting = true;
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-	materialData_->shininess = 10;
+	materialData_->shininess = 20;
 }
 
 void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
@@ -190,10 +192,12 @@ void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& vi
 	// DescriptorTableの設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall_ ? TextureManager::GetInstance()->GetTextureSrvHandleGPU()[MONSTERBALL] : TextureManager::GetInstance()->GetTextureSrvHandleGPU()[UVCHEKER]);
 
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
-
 	// マテリアルCBufferの場所を設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(6, PointLight::GetInstance()->GetPointLightResource()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(7, SpotLight::GetInstance()->GetSpotLightResource()->GetGPUVirtualAddress());
+
 	DirectXCommon::GetInstance()->GetCommandList()->DrawInstanced(vertexIndex, 1, 0, 0);
 }
 

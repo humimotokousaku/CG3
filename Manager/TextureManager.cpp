@@ -25,6 +25,7 @@ void TextureManager::TransferTexture(const Microsoft::WRL::ComPtr<ID3D12Descript
 	mipImages_[FENCE] = LoadTexture("resources/fence/fence.png");
 	mipImages_[WHITE] = LoadTexture("resources/white.png");
 	mipImages_[PARTICLE] = LoadTexture("resources/circle.png");
+	mipImages_[GROUND] = LoadTexture("resources/ground/grass.png");
 
 	DirectX::TexMetadata metadata[kMaxImages]{};
 	for (uint32_t i = 0; i < kMaxImages; i++) {

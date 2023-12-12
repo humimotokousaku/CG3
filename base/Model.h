@@ -45,6 +45,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_;
+	// カメラ
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_;
+	Vector3 cameraPosData_;
 
 	ModelData modelData_;
 };

@@ -125,11 +125,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "dxil.dll"</Com
     <ClCompile Include="object\Triangle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Particles.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="scene\GameClear.cpp" />
     <ClCompile Include="scene\GameOver.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="scene\TitleScene.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="utility\ConvertString.cpp" />
     <ClCompile Include="utility\GlobalVariables.cpp" />
   </ItemGroup>
@@ -170,12 +172,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "dxil.dll"</Com
     <ClInclude Include="object\Sprite.h" />
     <ClInclude Include="object\Triangle.h" />
     <ClInclude Include="Particles.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="scene\GameClear.h" />
     <ClInclude Include="scene\GameOver.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\TitleScene.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformationMatrix.h" />
     <ClInclude Include="utility\ConvertString.h" />

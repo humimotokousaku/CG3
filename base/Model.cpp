@@ -1,5 +1,7 @@
 #include "Model.h"
 #include "../components/camera/Camera.h"
+#include "../PointLight.h"
+#include "../SpotLight.h"
 #include "../Manager/ImGuiManager.h"
 #include "../utility/GlobalVariables.h"
 #include "../Manager/PipelineManager.h"
@@ -15,6 +17,12 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	CreateVertexBufferView();
 
 	CreateMaterialResource();
+
+	// 1つ分のサイズを用意する
+	cameraPosResource_ = CreateBufferResource(DirectXCommon::GetInstance()->GetDevice(), sizeof(Vector3)).Get();
+	// 書き込むためのアドレスを取得
+	cameraPosResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraPosData_));
+
 	// 書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
@@ -26,12 +34,13 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	};
 
 	// Lightingするか
-	materialData_->enableLighting = false;
+	materialData_->enableLighting = true;
 
 	materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
 
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->shininess = 20;
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int textureHandle, int blendNum) {
@@ -39,6 +48,8 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeRotateZMatrix(uvTransform_.rotate.z));
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
 	//materialData_->uvTransform = uvTransformMatrix_;
+
+	cameraPosData_ = viewProjection.translation_;
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[blendNum].Get());
@@ -51,14 +62,16 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_); // VBVを設定
 
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.constBuff_->GetGPUVirtualAddress());
-
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraPosResource_.Get()->GetGPUVirtualAddress());
 	// DescriptorTableの設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[textureHandle]);
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
-
 	// マテリアルCBufferの場所を設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(6, PointLight::GetInstance()->GetPointLightResource()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(7, SpotLight::GetInstance()->GetSpotLightResource()->GetGPUVirtualAddress());
+
 	DirectXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 }
 

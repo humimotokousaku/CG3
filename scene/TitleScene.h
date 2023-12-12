@@ -28,6 +28,7 @@ private:
 
 	Particles* particles_;
 	Sphere* sphere_;
+	Model* ground_;
 
 	int blendMode_ = kBlendModeNone;
 

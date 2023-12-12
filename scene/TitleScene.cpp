@@ -19,7 +19,7 @@ void TitleScene::Initialize() {
 	sphere_ = new Sphere();
 	sphere_->Initialize();
 
-	//particles_->SetEmitterParent(&worldTransform_);
+	ground_ = Model::CreateModelFromObj("resources/ground", "terrain.obj");
 
 	isVibration_ = false;
 }
@@ -114,6 +114,7 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 	particles_->Draw(viewProjection_, PARTICLE);
 	sphere_->Draw(worldTransform_, viewProjection_);
+	ground_->Draw(worldTransform_, viewProjection_, GROUND,1);
 }
 
 void TitleScene::Finalize() {

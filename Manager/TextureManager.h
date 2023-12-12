@@ -23,6 +23,7 @@ enum TextureName {
 	FENCE,
 	WHITE,
 	PARTICLE,
+	GROUND,
 	NONE_TEXTURE
 };
 

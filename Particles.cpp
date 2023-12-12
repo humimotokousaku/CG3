@@ -1,5 +1,6 @@
 #include "Particles.h"
 #include "components/camera/Camera.h"
+#include "PointLight.h"
 #include "Manager/ImGuiManager.h"
 #include "utility/GlobalVariables.h"
 #include "Manager/PipelineManager.h"
@@ -161,6 +162,7 @@ void Particles::Draw(const ViewProjection& viewProjection, int textureNum) {
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[textureNum]);
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+	//DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(6, PointLight::GetInstance()->GetPointLightResource()->GetGPUVirtualAddress());
 
 	// マテリアルCBufferの場所を設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
