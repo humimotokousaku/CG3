@@ -19,8 +19,7 @@ void SpotLight::Initialize() {
 	// spotLightingのデフォ値
 	spotLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	spotLightData_->pos = { 2.0f, 1.25f, 0.0f };
-	spotLightData_->intensity = 1.0f;
-	spotLightData_->decay = 1.0f;
+	spotLightData_->intensity = 0.0f;
 	spotLightData_->direction = Normalize(Vector3{ -1.0f, -1.0f, 0.0f });
 	spotLightData_->distance = 7.0f;
 	spotLightData_->decay = 2.0f;

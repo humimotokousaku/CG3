@@ -12,6 +12,8 @@ void TitleScene::Initialize() {
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
 
+	worldTransform_.translation_.y = -1.5f;
+
 	// パーティクルの生成
 	particles_ = new Particles();
 	particles_->Initialize(true,true);
@@ -113,7 +115,7 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 	particles_->Draw(viewProjection_, PARTICLE);
-	sphere_->Draw(worldTransform_, viewProjection_);
+	//sphere_->Draw(worldTransform_, viewProjection_);
 	ground_->Draw(worldTransform_, viewProjection_, GROUND,1);
 }
 
