@@ -30,6 +30,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencilResource() { return depthStencilResource_.Get(); }
 	D3D12_DEPTH_STENCIL_DESC GetDepthStencilDesc() { return depthStencilDesc_; }
+	D3D12_DEPTH_STENCIL_DESC GetParticleDepthStencilDesc() { return particleDepthStencilDesc_; }
 	Microsoft::WRL::ComPtr<ID3D12PipelineState>* GetGraphicsPipelineState() { return graphicsPipelineState_; }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature>* GetRootSignature() { return rootSignature_; }
 
@@ -152,4 +153,6 @@ private:
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
+	// particle
+	D3D12_DEPTH_STENCIL_DESC particleDepthStencilDesc_;
 };

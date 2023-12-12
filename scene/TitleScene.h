@@ -23,7 +23,7 @@ public:
 private:
 	const static int kMaxObject = 2;
 	Input* input_;
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[kMaxObject];
 	ViewProjection viewProjection_;
 
 	Particles* particles_;

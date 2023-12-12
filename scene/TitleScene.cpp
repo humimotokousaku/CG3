@@ -7,14 +7,16 @@ void TitleScene::Initialize() {
 
 
 	viewProjection_.Initialize();
-	worldTransform_.Initialize();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].Initialize();
+	}
 
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
 
 	// パーティクルの生成
 	particles_ = new Particles();
-	particles_->Initialize(true,true);
+	particles_->Initialize(true, true);
 
 	sphere_ = new Sphere();
 	sphere_->Initialize();
@@ -26,8 +28,9 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 	particles_->Update();
-
-	worldTransform_.UpdateMatrix();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].UpdateMatrix();
+	}
 
 	if (input_->PressKey(DIK_SPACE)) {
 		isVibration_ = true;
@@ -104,8 +107,8 @@ void TitleScene::Update() {
 
 	ImGui::Begin("BlendMode");
 	sphere_->ImGuiAdjustParameter();
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.1f, -6.28f, 6.28f);
+	ImGui::DragFloat3("worldTransform.translate", &worldTransform_[0].translation_.x, 0.1f, -10.0f, 10.0f);
+	ImGui::DragFloat3("groundWorldTransform.translate", &worldTransform_[1].translation_.x, 0.1f, -10.0f, 10.0f);
 	ImGui::End();
 
 	particles_->ImGuiAdjustParameter();
@@ -113,12 +116,14 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 	particles_->Draw(viewProjection_, PARTICLE);
-	sphere_->Draw(worldTransform_, viewProjection_);
-	ground_->Draw(worldTransform_, viewProjection_, GROUND,1);
+	sphere_->Draw(worldTransform_[0], viewProjection_);
+	ground_->Draw(worldTransform_[1], viewProjection_, GROUND, 0);
 }
 
 void TitleScene::Finalize() {
-	worldTransform_.constBuff_.ReleaseAndGetAddressOf();
+	for (int i = 0; i < kMaxObject; i++) {
+		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
+	}
 
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
 	delete particles_;

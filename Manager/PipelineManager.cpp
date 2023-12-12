@@ -161,7 +161,7 @@ void PipelineManager::CreateRootParameter() {
 			rootParameters_[i][1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 			rootParameters_[i][1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 			rootParameters_[i][1].Descriptor.ShaderRegister = 0;
-			
+
 			// texture
 			rootParameters_[i][2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParameters_[i][2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -246,7 +246,7 @@ void PipelineManager::CreateRootSignature() {
 }
 
 void PipelineManager::SettingInputLayout() {
-	for (int i = 0; i < kMaxPSO-1; i++) {
+	for (int i = 0; i < kMaxPSO - 1; i++) {
 		inputElementDescs_[i][0].SemanticName = "POSITION";
 		inputElementDescs_[i][0].SemanticIndex = 0;
 		inputElementDescs_[i][0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -373,18 +373,29 @@ void PipelineManager::CreatePSO() {
 			vertexShaderBlob_->GetBufferSize() }; // vertexShader
 			graphicsPipelineStateDescs_[i].PS = { pixelShaderBlob_->GetBufferPointer(),
 			pixelShaderBlob_->GetBufferSize() }; // pixelShader
+			// DepthStencilの設定
+			graphicsPipelineStateDescs_[i].DepthStencilState = GetDepthStencilDesc();
+			graphicsPipelineStateDescs_[i].DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		}
 		// particleの時
 		else if (i == 6) {
+			// DepthStencilの設定
+			// Depthの機能を有効化する
+			particleDepthStencilDesc_.DepthEnable = true;
+			// 書き込みをします
+			particleDepthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+			// 比較関数はLessEqual。つまり、近ければ描画される
+			particleDepthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			graphicsPipelineStateDescs_[i].DepthStencilState = GetParticleDepthStencilDesc();
+			graphicsPipelineStateDescs_[i].DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 			graphicsPipelineStateDescs_[i].VS = { particleVertexShaderBlob_->GetBufferPointer(),
 			particleVertexShaderBlob_->GetBufferSize() }; // vertexShader
 			graphicsPipelineStateDescs_[i].PS = { particlePixelShaderBlob_->GetBufferPointer(),
 			particlePixelShaderBlob_->GetBufferSize() }; // pixelShader
 		}
 
-		// DepthStencilの設定
-		graphicsPipelineStateDescs_[i].DepthStencilState = GetDepthStencilDesc();
-		graphicsPipelineStateDescs_[i].DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 
 		graphicsPipelineStateDescs_[i].BlendState = blendDesc_[i]; // blendState
 		graphicsPipelineStateDescs_[i].RasterizerState = rasterizerDesc_[i]; // rasterizerState
@@ -536,7 +547,7 @@ void PipelineManager::SettingDepthStencilState() {
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
 	// 書き込みをします
-	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	// 比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
