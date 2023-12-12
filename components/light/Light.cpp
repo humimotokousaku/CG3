@@ -53,7 +53,7 @@ void Light::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device) {
 
 	// Lightingのデフォ値
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };
+	directionalLightData_->direction = Normalize({ 0.0f, -1.0f, 0.0f });
 	directionalLightData_->intensity = 1.0f;
 }
 

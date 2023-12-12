@@ -120,4 +120,5 @@ void TitleScene::Finalize() {
 
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
 	delete particles_;
+	delete sphere_;
 }
