@@ -99,10 +99,6 @@ void TitleScene::Update() {
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
 
-	ImGui::Begin("BlendMode");
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::End();
-
 	particles_->ImGuiAdjustParameter();
 }
 

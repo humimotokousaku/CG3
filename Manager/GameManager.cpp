@@ -108,7 +108,7 @@ void GameManager::Run() {
 			sceneArr_[sceneNum_]->Update();
 
 			// ImGuiのパラメータを入れている
-			ImGuiAdjustParameter();
+			//ImGuiAdjustParameter();
 
 			///
 			/// 描画処理
