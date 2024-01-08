@@ -40,7 +40,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-	materialData_->shininess = 20;
+	materialData_->shininess = 10;
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int textureHandle, int blendNum) {
@@ -49,7 +49,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	//uvTransformMatrix_ = Multiply(uvTransformMatrix_, MakeTranslateMatrix(uvTransform_.translate));
 	//materialData_->uvTransform = uvTransformMatrix_;
 
-	cameraPosData_ = viewProjection.translation_;
+	*cameraPosData_ = viewProjection.translation_;// viewProjection.translation_;
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(PipelineManager::GetInstance()->GetRootSignature()[blendNum].Get());
@@ -63,7 +63,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.constBuff_->GetGPUVirtualAddress());
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraPosResource_.Get()->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraPosResource_->GetGPUVirtualAddress());
 	// DescriptorTableの設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[textureHandle]);
 	// マテリアルCBufferの場所を設定

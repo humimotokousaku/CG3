@@ -47,7 +47,7 @@ private:
 	VertexData* vertexData_;
 	// カメラ
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraPosResource_;
-	Vector3 cameraPosData_;
+	Vector3* cameraPosData_;
 
 	ModelData modelData_;
 };

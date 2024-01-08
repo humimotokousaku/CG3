@@ -129,6 +129,7 @@ void GameManager::Run() {
 
 void GameManager::BeginFrame() {
 	input_->Update();
+
 	pipelineManager_->BeginFrame();
 	// デバッグカメラ
 	debugCamera_->Update();

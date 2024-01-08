@@ -193,11 +193,10 @@ Particle Particles::MakeNewParticle(std::mt19937& randomEngine, const Vector3& t
 	Particle particle;
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
 	particle.transform.rotate = { 0,0,0 };
+	
 	Vector3 randomTranslate;
-
 	randomTranslate = { distribution(randomEngine),distribution(randomEngine) ,distribution(randomEngine) };
 	particle.transform.translate = Add(translate, randomTranslate);
-	//if()
 	particle.vel = { distribution(randomEngine) ,distribution(randomEngine) ,distribution(randomEngine) };
 	particle.color = { distColor(randomEngine),distColor(randomEngine) ,distColor(randomEngine),1.0f };
 	particle.lifeTime = distTime(randomEngine);

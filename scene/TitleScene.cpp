@@ -12,7 +12,7 @@ void TitleScene::Initialize() {
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
 
-	worldTransform_.translation_.y = -1.5f;
+	worldTransform_.translation_.y = -1.0f;
 
 	// パーティクルの生成
 	particles_ = new Particles();
@@ -104,10 +104,8 @@ void TitleScene::Update() {
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
 
-	ImGui::Begin("BlendMode");
-	sphere_->ImGuiAdjustParameter();
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("scale", &worldTransform_.scale_.x, 0.1f, -6.28f, 6.28f);
+	ImGui::Begin("Ground");
+	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f, -10.0f, 10.0f);
 	ImGui::End();
 
 	particles_->ImGuiAdjustParameter();
