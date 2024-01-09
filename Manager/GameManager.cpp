@@ -102,8 +102,8 @@ void GameManager::Run() {
 
 			//シーン変更チェック
 			if (sceneNum_ != preSceneNum_) {
-				sceneArr_[sceneNum_]->Initialize();
 				sceneArr_[preSceneNum_]->Finalize();
+				sceneArr_[sceneNum_]->Initialize();
 			}
 
 			///
@@ -150,7 +150,7 @@ void GameManager::EndFrame() {
 
 void GameManager::Finalize() {
 	sceneArr_[sceneNum_]->Finalize();
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 4; i++) {
 		delete sceneArr_[i];
 	}
 	// ImGui
