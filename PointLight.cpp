@@ -61,9 +61,9 @@ void PointLight::CreatePointLightResource() {
 
 
 void PointLight::ImGuiAdjustParameter() {
-	ImGui::SliderFloat3("PointLighting.pos", &pointLightData_->pos.x, -100, 100);
+	ImGui::DragFloat3("PointLighting.pos", &pointLightData_->pos.x,0.1f, -100, 100);
 	ImGui::ColorEdit3("PointLighting.color", &pointLightData_->color.x);
-	ImGui::SliderFloat("PointLighting.intensity", &pointLightData_->intensity, 0, 1);
-	ImGui::SliderFloat("PointLighting.radius", &pointLightData_->radius, 0, 10);
-	ImGui::SliderFloat("PointLighting.decay", &pointLightData_->decay, 0, 10);
+	ImGui::DragFloat("PointLighting.intensity", &pointLightData_->intensity, 0.01f, 0, 1);
+	ImGui::DragFloat("PointLighting.radius", &pointLightData_->radius, 0.1f, 0, 50);
+	ImGui::DragFloat("PointLighting.decay", &pointLightData_->decay, 0.01f, 0, 10);
 }

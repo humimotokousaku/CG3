@@ -34,7 +34,7 @@ void SpotLight::ImGuiAdjustParameter() {
 	ImGui::DragFloat("spotLighting.cosFalloffStart", &spotLightData_->cosFalloffStart, 0.01f, 0, 6.28f);
 	ImGui::DragFloat("spotLighting.distance", &spotLightData_->distance,0.1f, 0, 10);
 	ImGui::DragFloat("spotLighting.decay", &spotLightData_->decay,0.1f, 0, 10);
-	ImGui::DragFloat("spotLighting.intensity", &spotLightData_->intensity,0.1f, 0, 1);
+	ImGui::DragFloat("spotLighting.intensity", &spotLightData_->intensity,0.1f, 0, 100);
 	ImGui::ColorEdit3("spotLighting.color", &spotLightData_->color.x);
 }
 
