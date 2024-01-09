@@ -107,8 +107,9 @@ void TitleScene::Update() {
 
 	ImGui::Begin("BlendMode");
 	sphere_->ImGuiAdjustParameter();
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_[0].translation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("groundWorldTransform.translate", &worldTransform_[1].translation_.x, 0.1f, -10.0f, 10.0f);
+	ground_->ImGuiAdjustParameter();
+	ImGui::DragFloat3("worldTransform.translate", &worldTransform_[0].translation_.x, 0.1f, -100.0f, 100.0f);
+	ImGui::DragFloat3("groundWorldTransform.translate", &worldTransform_[1].translation_.x, 0.1f, -100.0f, 100.0f);
 	ImGui::End();
 
 	particles_->ImGuiAdjustParameter();

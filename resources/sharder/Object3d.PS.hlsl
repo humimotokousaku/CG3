@@ -90,7 +90,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 		// 拡散反射
 		float32_t3 diffusePointLight = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * gPointLight.intensity * factor;
 		// 鏡面反射
-		float32_t3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * pointLightSpecularPow * float32_t3(1.0f, 1.0f, 1.0f);
+		float32_t3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * pointLightSpecularPow * float32_t3(1.0f, 1.0f, 1.0f) * factor;
 
 		/// スポットライト
 		float32_t3 spotLightToEye = normalize(gCamera.worldPosition - input.worldPosition);
@@ -98,14 +98,14 @@ PixelShaderOutput main(VertexShaderOutput input) {
 		float spotLightNdotH = dot(normalize(input.normal), spotLightHalfVector);
 		float spotLightSpecularPow = pow(saturate(spotLightNdotH), gMaterial.shininess);
 		float32_t cosAngle = dot(spotLightDirectionOnSurface, gSpotLight.direction);
-		float32_t falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+		float32_t falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
 		// 光の減衰
 		float32_t dist = length(gSpotLight.pos - input.worldPosition);
-		float32_t attenuationFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
+		float32_t attenuationFactor = pow(1.0f / (dist * dist), gSpotLight.decay);
 		// 拡散反射
 		float32_t3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
 		// 鏡面反射
-		float32_t3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * spotLightSpecularPow * float32_t3(1.0f, 1.0f, 1.0f);
+		float32_t3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * spotLightSpecularPow * float32_t3(1.0f, 1.0f, 1.0f) * attenuationFactor;
 
 		// 拡散反射 + 鏡面反射
 		output.color.rgb = diffuse + specular + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;

@@ -190,7 +190,7 @@ void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& vi
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(4, viewProjection.constBuff_->GetGPUVirtualAddress());
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraPosResource_.Get()->GetGPUVirtualAddress());
 	// DescriptorTableの設定
-	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[UVCHEKER]);
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureSrvHandleGPU()[MONSTERBALL]);
 	// マテリアルCBufferの場所を設定
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Light::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
@@ -211,5 +211,5 @@ void Sphere::ImGuiAdjustParameter() {
 	ImGui::SliderFloat2("UvTranslate", &uvTransform_.translate.x, -5, 5);
 	ImGui::SliderFloat2("UvScale", &uvTransform_.scale.x, -5, 5);
 	ImGui::SliderAngle("UvRotate.z", &uvTransform_.rotate.z);
-	ImGui::DragFloat("shininess", &materialData_->shininess, 0.01f, 0, 50);
+	ImGui::DragFloat("shininess", &materialData_->shininess, 0.01f, 0, 100);
 }

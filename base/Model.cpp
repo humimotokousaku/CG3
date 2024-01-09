@@ -204,5 +204,6 @@ void Model::CreateMaterialResource() {
 void Model::ImGuiAdjustParameter() {
 	ImGui::Begin("Model");
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
+	ImGui::DragFloat("Shininess", &materialData_->shininess);
 	ImGui::End();
 }
