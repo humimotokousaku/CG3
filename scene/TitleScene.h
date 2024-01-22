@@ -21,18 +21,10 @@ public:
 	void Draw() override;
 	void Finalize()override;
 private:
-	const static int kMaxObject = 2;
 	Input* input_;
-	WorldTransform worldTransform_[kMaxObject];
 	ViewProjection viewProjection_;
 
 	Particles* particles_;
-	Sphere* sphere_;
-	Model* ground_;
-
-	int blendMode_ = kBlendModeNone;
 
 	bool isVibration_;
-
-
 };

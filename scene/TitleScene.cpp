@@ -2,15 +2,9 @@
 #include "../Manager/ImGuiManager.h"
 
 void TitleScene::Initialize() {
-
 	input_ = Input::GetInstance();
-
-
 	viewProjection_.Initialize();
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].Initialize();
-	}
-
+	
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
 
@@ -18,33 +12,29 @@ void TitleScene::Initialize() {
 	particles_ = new Particles();
 	particles_->Initialize(true, true);
 
-	sphere_ = new Sphere();
-	sphere_->Initialize();
-
-	ground_ = Model::CreateModelFromObj("resources/ground", "terrain.obj");
-
+	// コントローラのバイブレーション
 	isVibration_ = false;
 }
 
 void TitleScene::Update() {
+	// パーティクル
 	particles_->Update();
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].UpdateMatrix();
-	}
 
+	// バイブレーション
 	if (input_->PressKey(DIK_SPACE)) {
 		isVibration_ = true;
 	}
 	else {
 		isVibration_ = false;
 	}
-
 	if (isVibration_) {
 		input_->GamePadVibration(0, 60000, 0000);
 	}
 	else {
 		input_->GamePadVibration(0, 0, 0);
 	}
+
+#pragma region カメラ操作
 
 	XINPUT_STATE joyState;
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
@@ -105,27 +95,17 @@ void TitleScene::Update() {
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
 
-	ImGui::Begin("BlendMode");
-	sphere_->ImGuiAdjustParameter();
-	ground_->ImGuiAdjustParameter();
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_[0].translation_.x, 0.1f, -100.0f, 100.0f);
-	ImGui::DragFloat3("groundWorldTransform.translate", &worldTransform_[1].translation_.x, 0.1f, -100.0f, 100.0f);
-	ImGui::End();
+#pragma endregion
 
+	// パーティクルのImGui
 	particles_->ImGuiAdjustParameter();
 }
 
 void TitleScene::Draw() {
 	particles_->Draw(viewProjection_, PARTICLE);
-	sphere_->Draw(worldTransform_[0], viewProjection_);
-	ground_->Draw(worldTransform_[1], viewProjection_, GROUND, 0);
 }
 
 void TitleScene::Finalize() {
-	for (int i = 0; i < kMaxObject; i++) {
-		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
-	}
-
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
 	delete particles_;
 }
