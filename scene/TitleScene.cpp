@@ -106,6 +106,7 @@ void TitleScene::Update() {
 	ImGui::Begin("ObjectParameter");
 	sphere_->ImGuiAdjustParameter();
 	ImGui::DragFloat3("Sphere.translate", &worldTransform_[0].translation_.x, 0.1f, -100.0f, 100.0f);
+	ImGui::DragFloat3("Sphere.Scale", &worldTransform_[0].scale_.x, 0.001f, -10.0f, 10.0f);
 	ImGui::DragFloat3("ground.translate", &worldTransform_[1].translation_.x, 0.1f, -100.0f, 100.0f);
 	ImGui::End();
 
