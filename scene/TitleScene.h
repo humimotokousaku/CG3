@@ -26,13 +26,8 @@ private:
 	WorldTransform worldTransform_[kMaxObject];
 	ViewProjection viewProjection_;
 
-	Particles* particles_;
 	Sphere* sphere_;
 	Model* ground_;
 
-	int blendMode_ = kBlendModeNone;
-
 	bool isVibration_;
-
-
 };

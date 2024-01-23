@@ -165,7 +165,7 @@ void Sphere::Initialize() {
 	materialData_->enableLighting = true;
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-	materialData_->shininess = 20;
+	materialData_->shininess = 30;
 }
 
 void Sphere::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
@@ -206,10 +206,5 @@ void Sphere::Release() {
 
 void Sphere::ImGuiAdjustParameter() {
 	ImGui::CheckboxFlags("isLighting", &materialData_->enableLighting, 1);
-	ImGui::Checkbox("useMonsterBall", &useMonsterBall_);
-	ImGui::Text("UvTransform");
-	ImGui::SliderFloat2("UvTranslate", &uvTransform_.translate.x, -5, 5);
-	ImGui::SliderFloat2("UvScale", &uvTransform_.scale.x, -5, 5);
-	ImGui::SliderAngle("UvRotate.z", &uvTransform_.rotate.z);
 	ImGui::DragFloat("shininess", &materialData_->shininess, 0.01f, 0, 100);
 }

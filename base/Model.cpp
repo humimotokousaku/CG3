@@ -40,7 +40,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 
 	// uvTransform行列の初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-	materialData_->shininess = 20;
+	materialData_->shininess = 50;
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, int textureHandle, int blendNum) {

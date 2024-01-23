@@ -171,21 +171,21 @@ void GameManager::ImGuiAdjustParameter() {
 	if (ImGui::BeginTabBar("CommonTabBar"))
 	{
 		// ライトのImGui
-		// 平行光源
-		if (ImGui::BeginTabItem("Directional Light")) {
-			light_->ImGuiAdjustParameter();
-			ImGui::EndTabItem();
-		}
 		// 点光源
 		if (ImGui::BeginTabItem("Point Light")) {
 			pointLight_->ImGuiAdjustParameter();
 			ImGui::EndTabItem();
 		}
-		// スポットライト
-		if (ImGui::BeginTabItem("Spot Light")) {
-			spotLight_->ImGuiAdjustParameter();
+		// 平行光源
+		if (ImGui::BeginTabItem("Directional Light")) {
+			light_->ImGuiAdjustParameter();
 			ImGui::EndTabItem();
 		}
+		// スポットライト
+		/*if (ImGui::BeginTabItem("Spot Light")) {
+			spotLight_->ImGuiAdjustParameter();
+			ImGui::EndTabItem();
+		}*/
 		ImGui::EndTabBar();
 	}
 	ImGui::End();

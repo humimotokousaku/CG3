@@ -13,21 +13,20 @@ void TitleScene::Initialize() {
 
 	// カメラの初期位置
 	viewProjection_.translation_.z = -5.0f;
-
-	// パーティクルの生成
-	particles_ = new Particles();
-	particles_->Initialize(true, true);
+	viewProjection_.rotation_.x = 0.25f;
 
 	sphere_ = new Sphere();
 	sphere_->Initialize();
 
 	ground_ = Model::CreateModelFromObj("resources/ground", "terrain.obj");
+	
+	worldTransform_[0].translation_ = {0,-1.4f, 1.0f};
+	worldTransform_[1].translation_ = { 0,-2.0f, 1.0f };
 
 	isVibration_ = false;
 }
 
 void TitleScene::Update() {
-	particles_->Update();
 	for (int i = 0; i < kMaxObject; i++) {
 		worldTransform_[i].UpdateMatrix();
 	}
@@ -38,7 +37,6 @@ void TitleScene::Update() {
 	else {
 		isVibration_ = false;
 	}
-
 	if (isVibration_) {
 		input_->GamePadVibration(0, 60000, 0000);
 	}
@@ -105,18 +103,19 @@ void TitleScene::Update() {
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
 
-	ImGui::Begin("BlendMode");
+	ImGui::Begin("ObjectParameter");
 	sphere_->ImGuiAdjustParameter();
-	ground_->ImGuiAdjustParameter();
-	ImGui::DragFloat3("worldTransform.translate", &worldTransform_[0].translation_.x, 0.1f, -100.0f, 100.0f);
-	ImGui::DragFloat3("groundWorldTransform.translate", &worldTransform_[1].translation_.x, 0.1f, -100.0f, 100.0f);
+	ImGui::DragFloat3("Sphere.translate", &worldTransform_[0].translation_.x, 0.1f, -100.0f, 100.0f);
+	ImGui::DragFloat3("ground.translate", &worldTransform_[1].translation_.x, 0.1f, -100.0f, 100.0f);
 	ImGui::End();
 
-	particles_->ImGuiAdjustParameter();
+	ImGui::Begin("Camera");
+	ImGui::DragFloat3("translate", &viewProjection_.translation_.x, 0.001f, -100, 100);
+	ImGui::DragFloat3("rotate", &viewProjection_.rotation_.x, 0.0001f, -6.28f, 6.28f);
+	ImGui::End();
 }
 
 void TitleScene::Draw() {
-	particles_->Draw(viewProjection_, PARTICLE);
 	sphere_->Draw(worldTransform_[0], viewProjection_);
 	ground_->Draw(worldTransform_[1], viewProjection_, GROUND, 0);
 }
@@ -125,7 +124,5 @@ void TitleScene::Finalize() {
 	for (int i = 0; i < kMaxObject; i++) {
 		worldTransform_[i].constBuff_.ReleaseAndGetAddressOf();
 	}
-
 	viewProjection_.constBuff_.ReleaseAndGetAddressOf();
-	delete particles_;
 }
